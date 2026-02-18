@@ -6,8 +6,9 @@
 
 1. Crear dominio/subdominio en Plesk
 2. Habilitar HTTPS (con Let's Encrypt)
-3. Crear base de datos con nombre `liga_[nombre-liga]` enganchada al dominio/subdominio
-4. Agregar carpeta wwwroot dentro del dominio *(no estoy seguro)*
+3. Web Application Firewall -> Detection only (si no, no andan ni PUT ni POST)
+4. Crear base de datos con nombre `liga_[nombre-liga]` enganchada al dominio/subdominio
+5. Agregar carpeta wwwroot dentro del dominio *(no estoy seguro si es necesario)*
 
 ### En repo back
 
