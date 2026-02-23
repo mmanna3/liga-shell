@@ -1,0 +1,26 @@
+{
+  "name": "liga",
+  "private": true,
+  "scripts": {
+    "fe:dev": "npm -C liga-fe run dev",
+    "fe:dev:lan": "npm -C liga-fe run dev:lan",
+    "fe:build": "npm -C liga-fe run build",
+    "fe:lint": "npm -C liga-fe run lint",
+    "fe:format": "npm -C liga-fe run format",
+    "fe:e2e": "npm -C liga-fe run e2e",
+    "fe:preview": "npm -C liga-fe run preview",
+
+    "app:start": "npm -C app-carnet-digital start",
+    "app:ios": "npm -C app-carnet-digital run ios",
+    "app:android": "npm -C app-carnet-digital run android",
+    "app:test": "npm -C app-carnet-digital run test:ci",
+
+    "be:dev": "dotnet watch run --project liga-be/Api/Api.csproj",
+
+    "contrato:fe": "bash scripts/generar-contrato-be-en-fe.sh",
+    "contrato:app": "bash scripts/generar-contrato-be-en-app.sh",
+
+    "deploy:local": "bash scripts/deploy-local.sh",
+    "buen-dia": "bash scripts/buen-dia.sh"
+  }
+}
