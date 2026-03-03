@@ -1,0 +1,30 @@
+appId: com.blueservant.edefi
+---
+# Flujo: home → Delegados/DT → login con credenciales incorrectas → mensaje de error
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd
+- tapOn:
+    id: 'card-delegados'
+# PantallaLogin
+- assertVisible:
+    id: 'pantalla-login'
+- tapOn:
+    id: 'input-usuario'
+- inputText: 'usuario-invalido'
+- tapOn:
+    id: 'input-password'
+- inputText: 'password-invalido'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'boton-iniciar-sesion'
+      enabled: true
+- tapOn:
+    id: 'boton-iniciar-sesion'
+# El backend devuelve error → la UI muestra el mensaje de error
+- assertVisible: 'Usuario o contraseña incorrectos'

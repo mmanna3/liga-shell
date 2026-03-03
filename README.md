@@ -1,5 +1,15 @@
 # Liga
 
+## Base de datos dev (liga_dev)
+
+Si tras los tests E2E o por otro motivo falla la conexión a la BD (`Cannot open database "liga_dev"`), ejecutá:
+
+```bash
+bash scripts/restaurar-bd-dev.sh
+```
+
+Luego `dotnet run --project liga-be/Api`. Requiere Docker con SQL Server (`liga-localhost`) corriendo.
+
 ## Agregar liga nueva
 
 ### En Plesk

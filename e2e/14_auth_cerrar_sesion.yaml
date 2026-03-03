@@ -1,0 +1,44 @@
+appId: com.blueservant.edefi
+---
+# Flujo: login → seleccionar equipo → menú → "Cerrar sesión" → vuelve a pantalla home
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd
+- tapOn:
+    id: 'card-delegados'
+# PantallaLogin
+- assertVisible:
+    id: 'pantalla-login'
+- tapOn:
+    id: 'input-usuario'
+- inputText: 'delegado-e2e'
+- tapOn:
+    id: 'input-password'
+- inputText: 'password123'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'boton-iniciar-sesion'
+      enabled: true
+- tapOn:
+    id: 'boton-iniciar-sesion'
+# PantallaSeleccionEquipo
+- assertVisible:
+    id: 'pantalla-seleccion-equipo'
+- tapOn:
+    id: 'item-equipo-1'
+# Tab Mis Jugadores — abrir menú → Cerrar sesión
+- assertVisible:
+    id: 'pantalla-mis-jugadores'
+- tapOn:
+    id: 'boton-menu-principal'
+- tapOn:
+    id: 'menu-item-cerrar-sesion'
+# El auth guard redirige a home (intro) tras cerrar sesión
+- extendedWaitUntil:
+    visible:
+      id: 'card-delegados'

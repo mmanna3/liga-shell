@@ -1,0 +1,52 @@
+appId: com.blueservant.edefi
+---
+# Flujo "jugador ya fichado": home → intro → código equipo → DNI → confirmación
+#
+# DNI 44444444 (Carlos Ruiz): seeded como Activo en Equipo 2, el-dni-esta-fichado
+# devuelve true y habilita el flujo ya-fichado (fichar-en-otro-equipo al Equipo 1).
+# (No se usa 87654321 porque ese DNI es también delegado; FicharEnOtroEquipo verifica
+# el estado del delegado, y si en una corrida anterior quedó como Pendiente, falla.)
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd
+- tapOn:
+    id: 'card-fichaje'
+# PantallaIntro
+- assertVisible:
+    id: 'card-ya-fichado'
+- tapOn:
+    id: 'card-ya-fichado'
+# PasoCodigoEquipo (paso 1 de 3)
+- assertVisible:
+    id: 'paso-codigo-equipo'
+- tapOn:
+    id: 'input-codigo-equipo'
+- inputText: 'MTD0001'
+- tapOn:
+    id: 'titulo-codigo-equipo'
+- extendedWaitUntil:
+    visible:
+      id: 'boton-validar'
+      enabled: true
+- tapOn:
+    id: 'boton-validar'
+# PasoDni (paso 2 de 3)
+- assertVisible:
+    id: 'paso-dni'
+- tapOn:
+    id: 'input-dni'
+- inputText: '44444444'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'boton-continuar'
+      enabled: true
+- tapOn:
+    id: 'boton-continuar'
+# PantallaConfirmacion
+- assertVisible:
+    id: 'pantalla-confirmacion'

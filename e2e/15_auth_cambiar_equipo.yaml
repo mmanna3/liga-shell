@@ -1,0 +1,50 @@
+appId: com.blueservant.edefi
+---
+# Flujo: login → seleccionar equipo 1 → menú → "Cambiar equipo" → seleccionar equipo 2 → mis jugadores
+#
+# delegado-e2e pertenece al Club 1 que tiene Equipo 1 (id=1) y Equipo B (id=2).
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd
+- tapOn:
+    id: 'card-delegados'
+# PantallaLogin
+- assertVisible:
+    id: 'pantalla-login'
+- tapOn:
+    id: 'input-usuario'
+- inputText: 'delegado-e2e'
+- tapOn:
+    id: 'input-password'
+- inputText: 'password123'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'boton-iniciar-sesion'
+      enabled: true
+- tapOn:
+    id: 'boton-iniciar-sesion'
+# PantallaSeleccionEquipo — seleccionar primer equipo
+- assertVisible:
+    id: 'pantalla-seleccion-equipo'
+- tapOn:
+    id: 'item-equipo-1'
+# Tab Mis Jugadores — abrir menú → Cambiar equipo
+- assertVisible:
+    id: 'pantalla-mis-jugadores'
+- tapOn:
+    id: 'boton-menu-principal'
+- tapOn:
+    id: 'menu-item-cambiar-equipo'
+# PantallaSeleccionEquipo de nuevo — seleccionar segundo equipo
+- assertVisible:
+    id: 'pantalla-seleccion-equipo'
+- tapOn:
+    id: 'item-equipo-2'
+# Tab Mis Jugadores con el nuevo equipo seleccionado
+- assertVisible:
+    id: 'pantalla-mis-jugadores'

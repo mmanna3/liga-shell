@@ -1,0 +1,34 @@
+appId: com.blueservant.edefi
+---
+# Flujo: home → fichaje → nuevo → ingresar código inválido → ver mensaje de error
+#
+# ABC0001: 7 caracteres, formato válido (3 letras + 4 dígitos), pero el checksum
+# no coincide con el esperado para ID 1 (MTD0001) → "El código es incorrecto".
+# No se usa "INVALIDO" (8 chars) porque el error sería "El código debe ser de 7 dígitos"
+# antes de llegar al check de existencia en la DB.
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd
+- tapOn:
+    id: 'card-fichaje'
+# PantallaIntro
+- assertVisible:
+    id: 'card-nuevo'
+- tapOn:
+    id: 'card-nuevo'
+# PasoCodigoEquipo
+- assertVisible:
+    id: 'paso-codigo-equipo'
+- tapOn:
+    id: 'input-codigo-equipo'
+- inputText: 'ABC0001'
+- tapOn:
+    id: 'titulo-codigo-equipo'
+- extendedWaitUntil:
+    visible:
+      id: 'boton-validar'
+      enabled: true
+- tapOn:
+    id: 'boton-validar'
+# El backend devuelve error → la UI muestra el mensaje de error
+- assertVisible: 'El código es incorrecto'

@@ -1,0 +1,31 @@
+appId: com.blueservant.edefi
+---
+# Flujo: home → Delegados/DT → login exitoso → pantalla de selección de equipo
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd
+- tapOn:
+    id: 'card-delegados'
+# PantallaLogin
+- assertVisible:
+    id: 'pantalla-login'
+- tapOn:
+    id: 'input-usuario'
+- inputText: 'delegado-e2e'
+- tapOn:
+    id: 'input-password'
+- inputText: 'password123'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'boton-iniciar-sesion'
+      enabled: true
+- tapOn:
+    id: 'boton-iniciar-sesion'
+# El auth guard redirige automáticamente a selección de equipo
+- assertVisible:
+    id: 'pantalla-seleccion-equipo'

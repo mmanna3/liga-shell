@@ -1,0 +1,65 @@
+appId: com.blueservant.edefi
+---
+# Flujo "delegado ya registrado" (verde): login → No estoy registrado → intro →
+# código club → DNI → confirmación → completado
+#
+# DNI 87654321 (Pedro González): seeded como Activo en Club 1, el-dni-esta-fichado
+# devuelve true → flujo delegado ya registrado.
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd
+- tapOn:
+    id: 'card-delegados'
+# PantallaLogin
+- assertVisible:
+    id: 'pantalla-login'
+- tapOn:
+    id: 'boton-no-registrado'
+# PantallaIntroDelegado
+- assertVisible:
+    id: 'pantalla-intro-delegado'
+- tapOn:
+    id: 'card-ya-registrado'
+# PasoCodigoClub (paso 1 de 3)
+- assertVisible:
+    id: 'paso-codigo-club'
+- tapOn:
+    id: 'input-codigo-club'
+- inputText: 'MTD0001'
+- tapOn:
+    id: 'titulo-codigo-club'
+- extendedWaitUntil:
+    visible:
+      id: 'boton-validar-club'
+      enabled: true
+- tapOn:
+    id: 'boton-validar-club'
+# PasoDniDelegado (paso 2 de 3)
+- assertVisible:
+    id: 'paso-dni-delegado'
+- tapOn:
+    id: 'input-dni-verde'
+- inputText: '87654321'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'boton-continuar-dni-verde'
+      enabled: true
+- tapOn:
+    id: 'boton-continuar-dni-verde'
+# PasoConfirmacionYaRegistrado (paso 3 de 3) → POST /api/Delegado/fichar-delegado-solo-con-dni-y-club
+- assertVisible:
+    id: 'paso-confirmacion-ya-registrado'
+- extendedWaitUntil:
+    visible:
+      id: 'boton-enviar-ya-registrado'
+      enabled: true
+- tapOn:
+    id: 'boton-enviar-ya-registrado'
+# PantallaCompletado
+- assertVisible:
+    id: 'pantalla-completado-delegado'

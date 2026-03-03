@@ -1,0 +1,57 @@
+appId: com.blueservant.edefi
+---
+# Flujo: login → seleccionar equipo → tab Buscar → buscar código inexistente → ver mensaje vacío
+#
+# LVI0003 es el código válido para el equipo ID=3, que no existe en la DB.
+# El backend decodifica el código correctamente, no encuentra jugadores y devuelve lista vacía.
+# La app muestra "No se encontraron jugadores para este equipo".
+# (MTD9999 falla validación de checksum → 400 → error, no sirve para este test.)
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd
+- tapOn:
+    id: 'card-delegados'
+# PantallaLogin
+- assertVisible:
+    id: 'pantalla-login'
+- tapOn:
+    id: 'input-usuario'
+- inputText: 'delegado-e2e'
+- tapOn:
+    id: 'input-password'
+- inputText: 'password123'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'boton-iniciar-sesion'
+      enabled: true
+- tapOn:
+    id: 'boton-iniciar-sesion'
+# PantallaSeleccionEquipo
+- assertVisible:
+    id: 'pantalla-seleccion-equipo'
+- tapOn:
+    id: 'item-equipo-1'
+# Tab Buscar
+- assertVisible:
+    id: 'pantalla-mis-jugadores'
+- tapOn: 'Buscar'
+- assertVisible:
+    id: 'pantalla-buscar'
+- tapOn:
+    id: 'input-codigo-buscar'
+- inputText: 'LVI0003'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- tapOn:
+    id: 'boton-buscar'
+- extendedWaitUntil:
+    visible: 'No se encontraron jugadores para este equipo'
+- assertVisible: 'No se encontraron jugadores para este equipo'

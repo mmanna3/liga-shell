@@ -2,3 +2,6 @@ liga-be/
 liga-fe/
 app-carnet-digital/
 .DS_Store
+
+scripts/crear-bd-liga/bin/
+scripts/crear-bd-liga/obj/

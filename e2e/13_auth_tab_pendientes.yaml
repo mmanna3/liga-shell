@@ -1,0 +1,46 @@
+appId: com.blueservant.edefi
+---
+# Flujo: login → seleccionar equipo → tab Pendientes → ver jugador pendiente de aprobación
+#
+# 33333333 (Jugador Pendiente) está seeded en Equipo 1 con estado FichajePendienteDeAprobacion.
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd
+- tapOn:
+    id: 'card-delegados'
+# PantallaLogin
+- assertVisible:
+    id: 'pantalla-login'
+- tapOn:
+    id: 'input-usuario'
+- inputText: 'delegado-e2e'
+- tapOn:
+    id: 'input-password'
+- inputText: 'password123'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'boton-iniciar-sesion'
+      enabled: true
+- tapOn:
+    id: 'boton-iniciar-sesion'
+# PantallaSeleccionEquipo
+- assertVisible:
+    id: 'pantalla-seleccion-equipo'
+- tapOn:
+    id: 'item-equipo-1'
+# Tab Pendientes
+- assertVisible:
+    id: 'pantalla-mis-jugadores'
+- tapOn: 'Pendientes'
+- assertVisible:
+    id: 'pantalla-pendientes'
+- extendedWaitUntil:
+    visible:
+      id: 'carnet-jugador'
+- assertVisible:
+    id: 'carnet-jugador'

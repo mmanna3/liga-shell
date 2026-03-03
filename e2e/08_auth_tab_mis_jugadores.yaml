@@ -1,0 +1,38 @@
+appId: com.blueservant.edefi
+---
+# Flujo: login → seleccionar equipo → tab Mis Jugadores muestra carnets
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd
+- tapOn:
+    id: 'card-delegados'
+# PantallaLogin
+- assertVisible:
+    id: 'pantalla-login'
+- tapOn:
+    id: 'input-usuario'
+- inputText: 'delegado-e2e'
+- tapOn:
+    id: 'input-password'
+- inputText: 'password123'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'boton-iniciar-sesion'
+      enabled: true
+- tapOn:
+    id: 'boton-iniciar-sesion'
+# PantallaSeleccionEquipo — tap en el primer equipo (Equipo de Prueba, id=1)
+- assertVisible:
+    id: 'pantalla-seleccion-equipo'
+- tapOn:
+    id: 'item-equipo-1'
+# Tab Mis Jugadores
+- assertVisible:
+    id: 'pantalla-mis-jugadores'
+- assertVisible:
+    id: 'carnet-jugador'

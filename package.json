@@ -21,6 +21,8 @@
     "contrato:app": "bash scripts/generar-contrato-be-en-app.sh",
 
     "deploy:local": "bash scripts/deploy-local.sh",
-    "buen-dia": "bash scripts/buen-dia.sh"
+    "buen-dia": "bash scripts/buen-dia.sh",
+
+    "e2e": "bash scripts/run-e2e-reales.sh"
   }
 }

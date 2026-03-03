@@ -1,0 +1,71 @@
+appId: com.blueservant.edefi
+---
+# Flujo: login → seleccionar equipo → menú "Fichar jugadores" →
+# card ya fichado (verde) → DNI → confirmación
+#
+# El equipo ya está en el store (delegado autenticado), no hay paso de código equipo.
+# DNI 55555555 (María López): seeded como Activo en Equipo 2, el-dni-esta-fichado
+# devuelve true → flujo ya-fichado (fichar-en-otro-equipo al Equipo 1).
+# (No se usa 87654321 para evitar conflicto con test 03 que lo ficha en Equipo 1.)
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd
+- tapOn:
+    id: 'card-delegados'
+# PantallaLogin
+- assertVisible:
+    id: 'pantalla-login'
+- tapOn:
+    id: 'input-usuario'
+- inputText: 'delegado-e2e'
+- tapOn:
+    id: 'input-password'
+- inputText: 'password123'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'boton-iniciar-sesion'
+      enabled: true
+- tapOn:
+    id: 'boton-iniciar-sesion'
+# PantallaSeleccionEquipo
+- assertVisible:
+    id: 'pantalla-seleccion-equipo'
+- tapOn:
+    id: 'item-equipo-1'
+# Tab Mis Jugadores — abrir menú
+- assertVisible:
+    id: 'pantalla-mis-jugadores'
+- tapOn:
+    id: 'boton-menu-principal'
+- tapOn:
+    id: 'menu-item-fichar-jugadores'
+# PantallaIntroDelegado
+- assertVisible:
+    id: 'pantalla-intro-delegado'
+- tapOn:
+    id: 'card-ya-fichado'
+# PasoDni (paso 1 de 2)
+- assertVisible:
+    id: 'paso-dni'
+- tapOn:
+    id: 'input-dni'
+- inputText: '55555555'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'boton-continuar'
+      enabled: true
+- tapOn:
+    id: 'boton-continuar'
+# PantallaConfirmacion
+- assertVisible:
+    id: 'pantalla-confirmacion'

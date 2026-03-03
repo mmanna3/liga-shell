@@ -1,0 +1,54 @@
+appId: com.blueservant.edefi
+---
+# Flujo: login → seleccionar equipo → tab Buscar → buscar por código MTD0001 → ver carnet
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd
+- tapOn:
+    id: 'card-delegados'
+# PantallaLogin
+- assertVisible:
+    id: 'pantalla-login'
+- tapOn:
+    id: 'input-usuario'
+- inputText: 'delegado-e2e'
+- tapOn:
+    id: 'input-password'
+- inputText: 'password123'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'boton-iniciar-sesion'
+      enabled: true
+- tapOn:
+    id: 'boton-iniciar-sesion'
+# PantallaSeleccionEquipo
+- assertVisible:
+    id: 'pantalla-seleccion-equipo'
+- tapOn:
+    id: 'item-equipo-1'
+# Tab Buscar
+- assertVisible:
+    id: 'pantalla-mis-jugadores'
+- tapOn: 'Buscar'
+- assertVisible:
+    id: 'pantalla-buscar'
+- tapOn:
+    id: 'input-codigo-buscar'
+- inputText: 'MTD0001'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- tapOn:
+    id: 'boton-buscar'
+- extendedWaitUntil:
+    visible:
+      id: 'carnet-jugador'
+- assertVisible:
+    id: 'carnet-jugador'
