@@ -1,0 +1,151 @@
+name: E2E Tests
+
+on:
+  push:
+  schedule:
+    - cron: '0 9 * * *'
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      BACKEND_PORT: '5072'
+
+    steps:
+      # ── Checkout ────────────────────────────────────────────────────────────
+
+      - name: Checkout liga
+        uses: actions/checkout@v4
+
+      - name: Checkout liga-be
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/liga-be
+          path: liga-be
+
+      - name: Checkout app-carnet-digital
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/app-carnet-digital
+          path: app-carnet-digital
+
+      # ── SQL Server ───────────────────────────────────────────────────────────
+      # La contraseña debe coincidir con liga-be/Api/appsettings.E2ETest.json
+      # (ConnectionStrings.Default). Está en texto plano en ese archivo ya que
+      # es una BD de tests, no de producción.
+
+      - name: Iniciar SQL Server
+        run: |
+          docker run -d --name sqlserver \
+            -e ACCEPT_EULA=Y \
+            -e 'SA_PASSWORD=Pas$word!39' \
+            -p 1433:1433 \
+            mcr.microsoft.com/mssql/server:2022-latest
+          echo "Esperando SQL Server..."
+          until nc -z localhost 1433; do sleep 3; done
+          sleep 10
+          echo "SQL Server listo."
+
+      # ── Backend .NET ─────────────────────────────────────────────────────────
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restaurar dependencias del backend
+        run: dotnet restore liga-be/Liga.sln
+
+      - name: Iniciar backend (E2ETest)
+        run: dotnet run --project liga-be/Api --no-restore &
+        env:
+          ASPNETCORE_ENVIRONMENT: E2ETest
+          E2E_SEED_ENABLED: 'true'
+
+      # ── Node.js ──────────────────────────────────────────────────────────────
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: app-carnet-digital/package-lock.json
+
+      - name: Instalar dependencias de app-carnet-digital
+        run: npm ci
+        working-directory: app-carnet-digital
+
+      # ── Maestro ──────────────────────────────────────────────────────────────
+
+      - name: Instalar Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      # ── Java 17 (requerido por Gradle para el build Android) ─────────────────
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # ── KVM (aceleración hardware del emulador) ──────────────────────────────
+
+      - name: Habilitar KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | \
+            sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      # ── Emulador Android + Tests ─────────────────────────────────────────────
+      #
+      # La estructura de directorios en CI espeja la local:
+      #   $GITHUB_WORKSPACE/            ← raíz del repo liga (ROOT)
+      #   $GITHUB_WORKSPACE/liga-be/    ← backend
+      #   $GITHUB_WORKSPACE/app-carnet-digital/  ← app móvil (APP_DIR)
+      #
+      # Flujo dentro del emulador:
+      #   1. Iniciar Metro en background (sirve el bundle JS con la URL del backend)
+      #   2. Build e instalar APK con expo run:android (usa el Metro ya en ejecución)
+      #   3. Ejecutar _e2e-ejecutar-tests.sh (seed → fotos → maestro → cleanup)
+
+      - name: Tests E2E en emulador Android
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          arch: x86_64
+          profile: pixel_2
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            set -e
+
+            # Iniciar Metro en background
+            cd "$GITHUB_WORKSPACE/app-carnet-digital"
+            EXPO_PUBLIC_E2E_API_URL=http://10.0.2.2:$BACKEND_PORT LIGA_ID=edefi npx expo start --no-interactive &
+            METRO_PID=$!
+            echo "Esperando Metro (puerto 8081)..."
+            until nc -z localhost 8081; do sleep 2; done
+            echo "Metro listo (PID $METRO_PID)."
+
+            # Build e instalar APK (--no-bundler: usa el Metro ya corriendo)
+            EXPO_PUBLIC_E2E_API_URL=http://10.0.2.2:$BACKEND_PORT LIGA_ID=edefi npx expo run:android --no-bundler
+
+            # Correr suite E2E
+            cd "$GITHUB_WORKSPACE"
+            bash scripts/_e2e-ejecutar-tests.sh
+
+      # ── Artefactos ───────────────────────────────────────────────────────────
+
+      - name: Subir reporte E2E
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-report
+          path: |
+            app-carnet-digital/e2e-report.html
+            app-carnet-digital/e2e-debug/
+          retention-days: 14
