@@ -76,6 +76,10 @@ jobs:
         run: npm ci
         working-directory: app-carnet-digital
 
+      - name: Prebuild Android (edefi)
+        run: LIGA_ID=edefi npm run prebuild:clean
+        working-directory: app-carnet-digital
+
       # ── Maestro ──────────────────────────────────────────────────────────────
 
       - name: Instalar Maestro
@@ -108,8 +112,8 @@ jobs:
       #   $GITHUB_WORKSPACE/app-carnet-digital/  ← app móvil (APP_DIR)
       #
       # Flujo dentro del emulador:
-      #   1. Iniciar Metro en background (sirve el bundle JS con la URL del backend)
-      #   2. Build e instalar APK con expo run:android (usa el Metro ya en ejecución)
+      #   1. Build APK debug con Gradle (bundle JS con EXPO_PUBLIC_E2E_API_URL embebida)
+      #   2. Instalar APK con adb
       #   3. Ejecutar _e2e-ejecutar-tests.sh (seed → fotos → maestro → cleanup)
 
       - name: Tests E2E en emulador Android
@@ -123,16 +127,12 @@ jobs:
           script: |
             set -e
 
-            # Iniciar Metro en background
-            cd "$GITHUB_WORKSPACE/app-carnet-digital"
-            EXPO_PUBLIC_E2E_API_URL=http://10.0.2.2:$BACKEND_PORT LIGA_ID=edefi npx expo start &
-            METRO_PID=$!
-            echo "Esperando Metro (puerto 8081)..."
-            until nc -z localhost 8081; do sleep 2; done
-            echo "Metro listo (PID $METRO_PID)."
+            # Build APK debug (JS bundle con la URL del backend embebida)
+            cd "$GITHUB_WORKSPACE/app-carnet-digital/android"
+            EXPO_PUBLIC_E2E_API_URL=http://10.0.2.2:$BACKEND_PORT ./gradlew assembleDebug --no-daemon
 
-            # Build e instalar APK (--no-bundler: usa el Metro ya corriendo)
-            EXPO_PUBLIC_E2E_API_URL=http://10.0.2.2:$BACKEND_PORT LIGA_ID=edefi npx expo run:android --no-bundler
+            # Instalar en el emulador
+            adb install "$GITHUB_WORKSPACE/app-carnet-digital/android/app/build/outputs/apk/debug/app-debug.apk"
 
             # Correr suite E2E
             cd "$GITHUB_WORKSPACE"
