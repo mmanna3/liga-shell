@@ -125,7 +125,7 @@ jobs:
 
             # Iniciar Metro en background
             cd "$GITHUB_WORKSPACE/app-carnet-digital"
-            EXPO_PUBLIC_E2E_API_URL=http://10.0.2.2:$BACKEND_PORT LIGA_ID=edefi npx expo start --no-interactive &
+            EXPO_PUBLIC_E2E_API_URL=http://10.0.2.2:$BACKEND_PORT LIGA_ID=edefi npx expo start &
             METRO_PID=$!
             echo "Esperando Metro (puerto 8081)..."
             until nc -z localhost 8081; do sleep 2; done
