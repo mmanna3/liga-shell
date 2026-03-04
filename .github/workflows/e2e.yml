@@ -67,7 +67,7 @@ jobs:
           dotnet build liga-be/Liga.sln
           ASPNETCORE_ENVIRONMENT=E2ETest E2E_SEED_ENABLED=true \
             ASPNETCORE_URLS=http://localhost:$BACKEND_PORT \
-            dotnet run --project liga-be/Api --no-restore --no-build --no-launch-profile &
+            dotnet run --project liga-be/Api --no-restore --no-launch-profile &
           echo "Esperando backend en puerto $BACKEND_PORT..."
           timeout 60 bash -c "until nc -z localhost $BACKEND_PORT; do sleep 2; done"
           echo "Backend listo."
