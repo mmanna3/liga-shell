@@ -26,7 +26,8 @@ if nc -z localhost "$BACKEND_PORT" 2>/dev/null; then
 else
   echo "Backend no disponible, reiniciando..."
   ASPNETCORE_ENVIRONMENT=E2ETest E2E_SEED_ENABLED=true \
-    dotnet run --project liga-be/Api --no-restore --no-build &
+    ASPNETCORE_URLS=http://localhost:$BACKEND_PORT \
+    dotnet run --project liga-be/Api --no-restore --no-build --no-launch-profile &
 fi
 
 bash scripts/_e2e-ejecutar-tests.sh
