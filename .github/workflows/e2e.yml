@@ -54,14 +54,8 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restaurar dependencias del backend
-        run: dotnet restore liga-be/Liga.sln
-
-      - name: Iniciar backend (E2ETest)
-        run: dotnet run --project liga-be/Api --no-restore &
-        env:
-          ASPNETCORE_ENVIRONMENT: E2ETest
-          E2E_SEED_ENABLED: 'true'
+      - name: Compilar backend
+        run: dotnet build liga-be/Liga.sln
 
       # ── Node.js ──────────────────────────────────────────────────────────────
 

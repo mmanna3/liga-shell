@@ -20,5 +20,9 @@ LIGA_ID=edefi EXPO_PUBLIC_E2E_API_URL="http://10.0.2.2:$BACKEND_PORT" ./gradlew 
 echo "Instalando APK en el emulador..."
 adb install "$APP_DIR/android/app/build/outputs/apk/debug/app-debug.apk"
 
+echo "Iniciando backend..."
 cd "$ROOT"
+ASPNETCORE_ENVIRONMENT=E2ETest E2E_SEED_ENABLED=true \
+  dotnet run --project liga-be/Api --no-restore --no-build &
+
 bash scripts/_e2e-ejecutar-tests.sh
