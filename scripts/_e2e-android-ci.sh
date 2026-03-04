@@ -15,7 +15,7 @@ BACKEND_PORT="${BACKEND_PORT:-5072}"
 
 echo "Compilando APK debug..."
 cd "$APP_DIR/android"
-EXPO_PUBLIC_E2E_API_URL="http://10.0.2.2:$BACKEND_PORT" ./gradlew assembleDebug --no-daemon
+LIGA_ID=edefi EXPO_PUBLIC_E2E_API_URL="http://10.0.2.2:$BACKEND_PORT" ./gradlew assembleDebug --no-daemon
 
 echo "Instalando APK en el emulador..."
 adb install "$APP_DIR/android/app/build/outputs/apk/debug/app-debug.apk"
