@@ -30,6 +30,11 @@ jobs:
           repository: ${{ github.repository_owner }}/app-carnet-digital
           path: app-carnet-digital
 
+      # ── Dependencias nativas (SkiaSharp) ────────────────────────────────────
+
+      - name: Instalar dependencias nativas
+        run: sudo apt-get install -y libfontconfig1 libfreetype6
+
       # ── SQL Server ───────────────────────────────────────────────────────────
       # La contraseña debe coincidir con liga-be/Api/appsettings.E2ETest.json
       # (ConnectionStrings.Default). Está en texto plano en ese archivo ya que
