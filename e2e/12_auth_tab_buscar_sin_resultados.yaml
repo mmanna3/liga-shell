@@ -1,4 +1,4 @@
-appId: com.blueservant.edefi
+appId: com.ykn.edefidelegados
 ---
 # Flujo: login → seleccionar equipo → tab Buscar → buscar código inexistente → ver mensaje vacío
 #

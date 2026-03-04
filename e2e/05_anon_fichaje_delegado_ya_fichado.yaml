@@ -1,4 +1,4 @@
-appId: com.blueservant.edefi
+appId: com.ykn.edefidelegados
 ---
 # Flujo "delegado ya registrado" (verde): login → No estoy registrado → intro →
 # código club → DNI → confirmación → completado

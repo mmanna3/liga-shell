@@ -1,4 +1,4 @@
-appId: com.blueservant.edefi
+appId: com.ykn.edefidelegados
 ---
 # Flujo: login → seleccionar equipo → tab Mis Jugadores muestra carnets
 - launchApp:

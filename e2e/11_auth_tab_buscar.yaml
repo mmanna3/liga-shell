@@ -1,4 +1,4 @@
-appId: com.blueservant.edefi
+appId: com.ykn.edefidelegados
 ---
 # Flujo: login → seleccionar equipo → tab Buscar → buscar por código MTD0001 → ver carnet
 - launchApp:
