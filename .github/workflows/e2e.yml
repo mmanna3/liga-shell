@@ -124,19 +124,7 @@ jobs:
           profile: pixel_2
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
-          script: |
-            set -e
-
-            # Build APK debug (JS bundle con la URL del backend embebida)
-            cd "$GITHUB_WORKSPACE/app-carnet-digital/android"
-            EXPO_PUBLIC_E2E_API_URL=http://10.0.2.2:$BACKEND_PORT ./gradlew assembleDebug --no-daemon
-
-            # Instalar en el emulador
-            adb install "$GITHUB_WORKSPACE/app-carnet-digital/android/app/build/outputs/apk/debug/app-debug.apk"
-
-            # Correr suite E2E
-            cd "$GITHUB_WORKSPACE"
-            bash scripts/_e2e-ejecutar-tests.sh
+          script: bash scripts/_e2e-android-ci.sh
 
       # ── Artefactos ───────────────────────────────────────────────────────────
 
