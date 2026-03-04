@@ -2,7 +2,7 @@ appId: com.ykn.edefidelegados
 ---
 # Flujo: login → seleccionar equipo → tab Buscar → buscar código inexistente → ver mensaje vacío
 #
-# LVI0003 es el código válido para el equipo ID=3, que no existe en la DB.
+# LVG0003 es el código válido para el equipo ID=3, que no existe en la DB.
 # El backend decodifica el código correctamente, no encuentra jugadores y devuelve lista vacía.
 # La app muestra "No se encontraron jugadores para este equipo".
 # (MTD9999 falla validación de checksum → 400 → error, no sirve para este test.)
@@ -44,7 +44,7 @@ appId: com.ykn.edefidelegados
     id: 'pantalla-buscar'
 - tapOn:
     id: 'input-codigo-buscar'
-- inputText: 'LVI0003'
+- inputText: 'LVG0003'
 - runFlow:
     when:
       platform: android
