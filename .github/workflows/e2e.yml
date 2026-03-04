@@ -32,8 +32,10 @@ jobs:
 
       # ── Dependencias nativas (SkiaSharp) ────────────────────────────────────
 
-      - name: Instalar dependencias nativas
-        run: sudo apt-get install -y libfontconfig1 libfreetype6
+      - name: Instalar dependencias nativas (SkiaSharp)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfontconfig1 libfreetype6 libglib2.0-0 libharfbuzz0b libpng16-16
 
       # ── SQL Server ───────────────────────────────────────────────────────────
       # La contraseña debe coincidir con liga-be/Api/appsettings.E2ETest.json
