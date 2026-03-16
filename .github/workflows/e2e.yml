@@ -61,9 +61,49 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
-      - name: Compilar e iniciar backend (E2ETest)
+      - name: Compilar backend
+        run: dotnet build liga-be/Liga.sln
+
+      # ── Node.js ──────────────────────────────────────────────────────────────
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: |
+            liga-fe/package-lock.json
+            app-carnet-digital/package-lock.json
+
+      # ── Tests E2E de frontend web (Playwright) ───────────────────────────────
+      #
+      # run-e2e-fe.sh gestiona su propio ciclo de vida del backend:
+      #   1. Levanta backend con ASPNETCORE_ENVIRONMENT=Development y BD exclusiva
+      #      (liga_e2e_fe_test) — necesario para que CORS esté habilitado.
+      #   2. Levanta el frontend (Vite) apuntando al backend.
+      #   3. Ejecuta los tests Playwright.
+      #   4. Al salir (trap EXIT): llama a /api/e2e-fe/cleanup y mata los procesos.
+      #
+      # Se ejecuta antes de los tests de app porque necesita el puerto 5072 libre.
+
+      - name: Instalar dependencias de liga-fe
+        run: npm ci
+        working-directory: liga-fe
+
+      - name: Instalar Playwright y navegadores (Chromium)
+        run: npx playwright install --with-deps chromium
+        working-directory: liga-fe
+
+      - name: Tests E2E de frontend
+        run: bash scripts/run-e2e-fe.sh
+
+      # ── Backend para tests de app (E2ETest) ──────────────────────────────────
+      #
+      # Se inicia después de los tests de FE porque run-e2e-fe.sh maneja
+      # su propio backend y lo termina al salir.
+
+      - name: Iniciar backend (E2ETest, tests de app)
         run: |
-          dotnet build liga-be/Liga.sln
           ASPNETCORE_ENVIRONMENT=E2ETest E2E_SEED_ENABLED=true \
             ASPNETCORE_URLS=http://localhost:$BACKEND_PORT \
             dotnet run --project liga-be/Api --no-restore --no-launch-profile &
@@ -78,15 +118,6 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-
-      # ── Node.js ──────────────────────────────────────────────────────────────
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: npm
-          cache-dependency-path: app-carnet-digital/package-lock.json
 
       - name: Instalar dependencias de app-carnet-digital
         run: npm ci
@@ -146,4 +177,5 @@ jobs:
           path: |
             app-carnet-digital/e2e-report.html
             app-carnet-digital/e2e-debug/
+            liga-fe/playwright-report/
           retention-days: 14
