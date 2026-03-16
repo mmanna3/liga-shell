@@ -54,6 +54,28 @@ Controllers → Core (interfaces) → Persistencia (implementaciones) → SQL Se
 
 **Repositorio genérico:** `IRepositorioABM<T>` define `Listar`, `Crear`, `ObtenerPorId`, `Modificar`. `IBDVirtual` abstrae `GuardarCambios()`.
 
+### Flujo completo ABM (crear entidad nueva)
+
+Para crear un flujo ABM completo de una entidad, seguir estos pasos:
+
+1. **Entidad** en `Api/Core/Entidades/` (extiende `Entidad`)
+2. **DTO** en `Api/Core/DTOs/` (extiende `DTO`)
+3. **Interface del repositorio** en `Api/Core/Repositorios/` (ej: `IEntidadRepo : IRepositorioABM<Entidad>`)
+4. **Repositorio** en `Api/Persistencia/Repositorios/` (hereda de `RepositorioABM<Entidad>`)
+5. **Interface del Core** en `Api/Core/Servicios/Interfaces/` (ej: `IEntidadCore : ICoreABM<EntidadDTO>`)
+6. **Core** en `Api/Core/Servicios/` (hereda de `ABMCore<IEntidadRepo, Entidad, EntidadDTO>`)
+7. **Controller** en `Api/Api/Controllers/` (hereda de `ABMController<EntidadDTO, IEntidadCore, EntidadDTO>`)
+8. **Mapeos AutoMapper** en `Api/_Config/MapperConfig.cs` (`CreateMap<Entidad, EntidadDTO>()` y `ReverseMap` si aplica)
+9. **Inyección de dependencias** en `Api/_Config/InyeccionDeDependenciasConfig.cs` (registrar Repo y Core)
+
+Si la entidad tiene colecciones hijas que se crean/modifican en bloque (no por separado):
+
+- Incluir la colección en el DTO con `Include` en el Set() del repositorio
+- En `Crear` y `AntesDeModificar` del Core: construir el grafo de entidades (padre + hijos) y asignar FKs
+- Para modificar: eliminar hijos existentes antes de agregar los nuevos
+
+Ejemplo de referencia: `FixtureAlgoritmo`, `FixtureAlgoritmoCore`, `FixtureAlgoritmoRepo`, `FixtureAlgoritmoController`.
+
 **Auth:** JWT Bearer. Clave en `AppSettings:Token` (`appsettings.json`).
 
 **Tests de integración:** `CustomWebApplicationFactory<Program>`. Cada clase de test hereda de `TestBase`, que hace `EnsureDeleted` + `EnsureCreated` antes de cada suite. Usuario de prueba: `test` / `test123`.

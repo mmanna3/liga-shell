@@ -23,6 +23,7 @@
     "deploy:local": "bash scripts/deploy-local.sh",
     "buen-dia": "bash scripts/buen-dia.sh",
 
-    "e2e": "bash scripts/run-e2e-reales.sh"
+    "e2e:app": "bash scripts/run-e2e-reales.sh",
+    "e2e:fe": "bash scripts/run-e2e-fe.sh"
   }
 }

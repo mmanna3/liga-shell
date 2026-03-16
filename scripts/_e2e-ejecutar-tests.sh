@@ -42,13 +42,13 @@ echo "Seed completado."
 
 echo ""
 echo "Instalando fotos de test en emulador..."
-adb push "$ROOT/e2e/foto-e2e.jpg" /sdcard/DCIM/foto-e2e-1.jpg
-adb push "$ROOT/e2e/foto-e2e.jpg" /sdcard/DCIM/foto-e2e-2.jpg
-adb push "$ROOT/e2e/foto-e2e.jpg" /sdcard/DCIM/foto-e2e-3.jpg
+adb push "$ROOT/e2e-app/foto-e2e.jpg" /sdcard/DCIM/foto-e2e-1.jpg
+adb push "$ROOT/e2e-app/foto-e2e.jpg" /sdcard/DCIM/foto-e2e-2.jpg
+adb push "$ROOT/e2e-app/foto-e2e.jpg" /sdcard/DCIM/foto-e2e-3.jpg
 adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///sdcard/DCIM/foto-e2e-1.jpg
 adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///sdcard/DCIM/foto-e2e-2.jpg
 adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///sdcard/DCIM/foto-e2e-3.jpg
 
 echo ""
 echo "Ejecutando tests E2E..."
-maestro test --debug-output "$APP_DIR/e2e-debug" --format HTML --output "$APP_DIR/e2e-report.html" "$ROOT/e2e/"
+maestro test --debug-output "$APP_DIR/e2e-debug" --format HTML --output "$APP_DIR/e2e-report.html" "$ROOT/e2e-app/"
