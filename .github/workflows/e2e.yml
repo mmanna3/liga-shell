@@ -222,6 +222,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -writable-system -memory 4096
+          disk-size: 4096M
           script: bash scripts/_e2e-android-ci.sh
 
       # ── Artefactos ────────────────────────────────────────────────────────
