@@ -29,8 +29,8 @@ echo "Liberando puertos $BACKEND_PORT y $FRONTEND_PORT si están ocupados..."
 lsof -ti tcp:"$BACKEND_PORT" | xargs kill -9 2>/dev/null || true
 lsof -ti tcp:"$FRONTEND_PORT" | xargs kill -9 2>/dev/null || true
 
-echo "Levantando backend (ASPNETCORE_ENVIRONMENT=E2EFETest)..."
-(cd "$ROOT" && ASPNETCORE_ENVIRONMENT=Development ASPNETCORE_URLS="http://localhost:$BACKEND_PORT" ConnectionStrings__Default="Server=localhost;Database=liga_e2e_fe_test;User Id=sa;Password=Pas\$word!39;TrustServerCertificate=True;" E2E_SEED_ENABLED=true dotnet run --project liga-be/Api --no-launch-profile) &
+echo "Levantando backend (E2ETest + BD liga_e2e_fe_test)..."
+(cd "$ROOT" && ASPNETCORE_ENVIRONMENT=E2ETest ASPNETCORE_URLS="http://localhost:$BACKEND_PORT" ConnectionStrings__Default="Server=localhost;Database=liga_e2e_fe_test;User Id=sa;Password=Pas\$word!39;TrustServerCertificate=True;" E2E_SEED_ENABLED=true dotnet run --project liga-be/Api --no-launch-profile) &
 BACKEND_PID=$!
 
 echo "Esperando que el backend levante en puerto $BACKEND_PORT..."
