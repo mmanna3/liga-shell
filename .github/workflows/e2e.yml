@@ -6,14 +6,109 @@ on:
     - cron: "0 9 * * *"
 
 jobs:
-  e2e:
+  # ── Job 1: Tests E2E de frontend web (Playwright) ──────────────────────────
+  e2e-fe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BACKEND_PORT: "5072"
+
+    steps:
+      # ── Checkout ──────────────────────────────────────────────────────────
+
+      - name: Checkout liga
+        uses: actions/checkout@v4
+
+      - name: Checkout liga-be
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/liga-be
+          path: liga-be
+
+      - name: Checkout liga-fe
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/liga-fe
+          path: liga-fe
+
+      # ── Dependencias nativas (SkiaSharp) ──────────────────────────────────
+
+      - name: Instalar dependencias nativas (SkiaSharp)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfontconfig1 libfreetype6 libglib2.0-0 libharfbuzz0b libpng16-16 libx11-dev
+
+      # ── SQL Server ────────────────────────────────────────────────────────
+
+      - name: Iniciar SQL Server
+        run: |
+          docker run -d --name sqlserver \
+            -e ACCEPT_EULA=Y \
+            -e 'SA_PASSWORD=Pas$word!39' \
+            -p 1433:1433 \
+            mcr.microsoft.com/mssql/server:2022-latest
+          echo "Esperando SQL Server..."
+          until nc -z localhost 1433; do sleep 3; done
+          sleep 10
+          echo "SQL Server listo."
+
+      # ── Backend .NET ──────────────────────────────────────────────────────
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Compilar backend
+        run: dotnet build liga-be/Liga.sln
+
+      # ── Node.js + Playwright ──────────────────────────────────────────────
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: liga-fe/package-lock.json
+
+      - name: Instalar dependencias de liga-fe
+        run: npm ci
+        working-directory: liga-fe
+
+      - name: Instalar Playwright y navegadores (Chromium)
+        run: npx playwright install --with-deps chromium
+        working-directory: liga-fe
+
+      # ── Tests ─────────────────────────────────────────────────────────────
+      #
+      # run-e2e-fe.sh gestiona su propio ciclo de vida del backend:
+      #   1. Levanta backend (E2ETest + BD liga_e2e_fe_test + CORS via E2E_SEED_ENABLED)
+      #   2. Levanta el frontend (Vite) apuntando al backend.
+      #   3. Ejecuta los tests Playwright.
+      #   4. Al salir (trap EXIT): llama a /api/e2e-fe/cleanup y mata los procesos.
+
+      - name: Tests E2E de frontend
+        run: bash scripts/run-e2e-fe.sh
+
+      # ── Artefactos ────────────────────────────────────────────────────────
+
+      - name: Subir reporte Playwright
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-fe-report
+          path: liga-fe/playwright-report/
+          retention-days: 14
+
+  # ── Job 2: Tests E2E de app móvil (Maestro + Android) ──────────────────────
+  e2e-app:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
       BACKEND_PORT: "5072"
 
     steps:
-      # ── Checkout ────────────────────────────────────────────────────────────
+      # ── Checkout ──────────────────────────────────────────────────────────
 
       - name: Checkout liga
         uses: actions/checkout@v4
@@ -30,23 +125,15 @@ jobs:
           repository: ${{ github.repository_owner }}/app-carnet-digital
           path: app-carnet-digital
 
-      - name: Checkout liga-fe
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.repository_owner }}/liga-fe
-          path: liga-fe
-
-      # ── Dependencias nativas (SkiaSharp) ────────────────────────────────────
+      # ── Dependencias nativas (SkiaSharp) ──────────────────────────────────
 
       - name: Instalar dependencias nativas (SkiaSharp)
         run: |
           sudo apt-get update
           sudo apt-get install -y libfontconfig1 libfreetype6 libglib2.0-0 libharfbuzz0b libpng16-16 libx11-dev
 
-      # ── SQL Server ───────────────────────────────────────────────────────────
+      # ── SQL Server ────────────────────────────────────────────────────────
       # La contraseña debe coincidir con liga-be/Api/appsettings.E2ETest.json
-      # (ConnectionStrings.Default). Está en texto plano en ese archivo ya que
-      # es una BD de tests, no de producción.
 
       - name: Iniciar SQL Server
         run: |
@@ -60,56 +147,16 @@ jobs:
           sleep 10
           echo "SQL Server listo."
 
-      # ── Backend .NET ─────────────────────────────────────────────────────────
+      # ── Backend .NET ──────────────────────────────────────────────────────
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
 
-      - name: Compilar backend
-        run: dotnet build liga-be/Liga.sln
-
-      # ── Node.js ──────────────────────────────────────────────────────────────
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: npm
-          cache-dependency-path: |
-            liga-fe/package-lock.json
-            app-carnet-digital/package-lock.json
-
-      # ── Tests E2E de frontend web (Playwright) ───────────────────────────────
-      #
-      # run-e2e-fe.sh gestiona su propio ciclo de vida del backend:
-      #   1. Levanta backend con ASPNETCORE_ENVIRONMENT=Development y BD exclusiva
-      #      (liga_e2e_fe_test) — necesario para que CORS esté habilitado.
-      #   2. Levanta el frontend (Vite) apuntando al backend.
-      #   3. Ejecuta los tests Playwright.
-      #   4. Al salir (trap EXIT): llama a /api/e2e-fe/cleanup y mata los procesos.
-      #
-      # Se ejecuta antes de los tests de app porque necesita el puerto 5072 libre.
-
-      - name: Instalar dependencias de liga-fe
-        run: npm ci
-        working-directory: liga-fe
-
-      - name: Instalar Playwright y navegadores (Chromium)
-        run: npx playwright install --with-deps chromium
-        working-directory: liga-fe
-
-      - name: Tests E2E de frontend
-        run: bash scripts/run-e2e-fe.sh
-
-      # ── Backend para tests de app (E2ETest) ──────────────────────────────────
-      #
-      # Se inicia después de los tests de FE porque run-e2e-fe.sh maneja
-      # su propio backend y lo termina al salir.
-
-      - name: Iniciar backend (E2ETest, tests de app)
+      - name: Compilar e iniciar backend (E2ETest)
         run: |
+          dotnet build liga-be/Liga.sln
           ASPNETCORE_ENVIRONMENT=E2ETest E2E_SEED_ENABLED=true \
             ASPNETCORE_URLS=http://localhost:$BACKEND_PORT \
             dotnet run --project liga-be/Api --no-restore --no-launch-profile &
@@ -117,13 +164,22 @@ jobs:
           timeout 60 bash -c "until nc -z localhost $BACKEND_PORT; do sleep 2; done"
           echo "Backend listo."
 
-      # ── Java 17 (requerido por Gradle: prebuild + build Android) ───────────────
+      # ── Java 17 (requerido por Gradle) ────────────────────────────────────
 
       - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
+
+      # ── Node.js ───────────────────────────────────────────────────────────
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: app-carnet-digital/package-lock.json
 
       - name: Instalar dependencias de app-carnet-digital
         run: npm ci
@@ -133,14 +189,14 @@ jobs:
         run: LIGA_ID=edefi npm run prebuild:clean
         working-directory: app-carnet-digital
 
-      # ── Maestro ──────────────────────────────────────────────────────────────
+      # ── Maestro ───────────────────────────────────────────────────────────
 
       - name: Instalar Maestro
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
 
-      # ── KVM (aceleración hardware del emulador) ──────────────────────────────
+      # ── KVM (aceleración hardware del emulador) ───────────────────────────
 
       - name: Habilitar KVM
         run: |
@@ -149,17 +205,12 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      # ── Emulador Android + Tests ─────────────────────────────────────────────
+      # ── Emulador Android + Tests ──────────────────────────────────────────
       #
       # La estructura de directorios en CI espeja la local:
       #   $GITHUB_WORKSPACE/            ← raíz del repo liga (ROOT)
       #   $GITHUB_WORKSPACE/liga-be/    ← backend
       #   $GITHUB_WORKSPACE/app-carnet-digital/  ← app móvil (APP_DIR)
-      #
-      # Flujo dentro del emulador:
-      #   1. Build APK debug con Gradle (bundle JS con EXPO_PUBLIC_E2E_API_URL embebida)
-      #   2. Instalar APK con adb
-      #   3. Ejecutar _e2e-ejecutar-tests.sh (seed → fotos → maestro → cleanup)
 
       - name: Tests E2E en emulador Android
         uses: reactivecircus/android-emulator-runner@v2
@@ -173,15 +224,14 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -writable-system -memory 4096
           script: bash scripts/_e2e-android-ci.sh
 
-      # ── Artefactos ───────────────────────────────────────────────────────────
+      # ── Artefactos ────────────────────────────────────────────────────────
 
-      - name: Subir reporte E2E
+      - name: Subir reporte E2E app
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: e2e-report
+          name: e2e-app-report
           path: |
             app-carnet-digital/e2e-report.html
             app-carnet-digital/e2e-debug/
-            liga-fe/playwright-report/
           retention-days: 14
