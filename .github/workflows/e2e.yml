@@ -30,6 +30,12 @@ jobs:
           repository: ${{ github.repository_owner }}/app-carnet-digital
           path: app-carnet-digital
 
+      - name: Checkout liga-fe
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/liga-fe
+          path: liga-fe
+
       # ── Dependencias nativas (SkiaSharp) ────────────────────────────────────
 
       - name: Instalar dependencias nativas (SkiaSharp)
