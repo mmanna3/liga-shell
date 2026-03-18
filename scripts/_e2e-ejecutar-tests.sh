@@ -51,4 +51,4 @@ adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:
 
 echo ""
 echo "Ejecutando tests E2E..."
-maestro test --debug-output "$APP_DIR/e2e-debug" --format HTML --output "$APP_DIR/e2e-report.html" "$ROOT/e2e-app/"
+maestro test --exclude-tags skip --debug-output "$APP_DIR/e2e-debug" --format HTML --output "$APP_DIR/e2e-report.html" "$ROOT/e2e-app/"

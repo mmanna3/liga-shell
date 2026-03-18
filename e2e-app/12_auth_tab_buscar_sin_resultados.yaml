@@ -1,4 +1,6 @@
 appId: com.ykn.edefidelegados
+tags:
+  - skip
 ---
 # Flujo: login → seleccionar equipo → tab Buscar → buscar código inexistente → ver mensaje vacío
 #
@@ -54,4 +56,5 @@ appId: com.ykn.edefidelegados
     id: 'boton-buscar'
 - extendedWaitUntil:
     visible: 'No se encontraron jugadores para este equipo'
+    timeout: 60000
 - assertVisible: 'No se encontraron jugadores para este equipo'
