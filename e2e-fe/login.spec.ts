@@ -1,8 +1,12 @@
 import { expect, test } from '@playwright/test'
-import { login } from './helpers'
+import { login, reseed } from './helpers'
 
 test.describe('Login', () => {
   test.describe.configure({ mode: 'serial' })
+
+  test.beforeAll(async () => {
+    await reseed()
+  })
 
   test('muestra el formulario de login', async ({ page }) => {
     await page.goto('/login')

@@ -1,8 +1,12 @@
 import { expect, test } from '@playwright/test'
-import { login } from './helpers'
+import { login, reseed } from './helpers'
 
 test.describe('Jugadores', () => {
   test.describe.configure({ mode: 'serial' })
+
+  test.beforeAll(async () => {
+    await reseed()
+  })
 
   test('muestra la lista de jugadores con datos', async ({ page }) => {
     await login(page)

@@ -1,8 +1,12 @@
 import { expect, test } from '@playwright/test'
-import { login } from './helpers'
+import { login, reseed } from './helpers'
 
 test.describe('Clubes', () => {
   test.describe.configure({ mode: 'serial' })
+
+  test.beforeAll(async () => {
+    await reseed()
+  })
 
   test('muestra la lista de clubes con datos', async ({ page }) => {
     await login(page)
@@ -42,5 +46,19 @@ test.describe('Clubes', () => {
     await page.waitForURL('/clubs')
     await expect(page).toHaveURL('/clubs')
     await expect(page.getByText('Club E2E Frontend')).toBeVisible()
+  })
+
+  test('edita un club y guarda los cambios', async ({ page }) => {
+    await login(page)
+    await page.goto('/clubs/editar/1')
+
+    // Esperar que el formulario cargue con los datos del club
+    await expect(page.getByLabel('Nombre')).toHaveValue('Club Defensores del Norte')
+
+    await page.getByLabel('Nombre').fill('Club Defensores Editado')
+    await page.getByRole('button', { name: 'Guardar' }).click()
+
+    await page.waitForURL(/\/clubs\/detalle\/1/)
+    await expect(page.getByText('Club Defensores Editado')).toBeVisible()
   })
 })
