@@ -41,9 +41,9 @@ test.describe('Clubes', () => {
 
     await page.getByLabel('Nombre').fill('Club E2E Frontend')
     await page.getByLabel('Dirección').fill('Calle Falsa 123')
+    const navPromise = page.waitForURL('/clubs')
     await page.getByRole('button', { name: 'Guardar' }).click()
-
-    await page.waitForURL('/clubs')
+    await navPromise
     await expect(page).toHaveURL('/clubs')
     await expect(page.getByText('Club E2E Frontend')).toBeVisible()
   })
@@ -56,9 +56,9 @@ test.describe('Clubes', () => {
     await expect(page.getByLabel('Nombre')).toHaveValue('Club Defensores del Norte')
 
     await page.getByLabel('Nombre').fill('Club Defensores Editado')
+    const navPromise = page.waitForURL(/\/clubs\/detalle\/1/)
     await page.getByRole('button', { name: 'Guardar' }).click()
-
-    await page.waitForURL(/\/clubs\/detalle\/1/)
+    await navPromise
     await expect(page.getByText('Club Defensores Editado')).toBeVisible()
   })
 })

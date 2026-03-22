@@ -46,9 +46,12 @@ test.describe('Aprobación y rechazo de jugadores', () => {
 
     await expect(page.getByText('Jugador')).toBeVisible()
     await page.getByPlaceholder('Escribe el motivo del rechazo...').fill('Documentación incompleta')
-    await page.getByRole('button', { name: 'Rechazar' }).click()
 
-    await page.waitForURL('/jugadores')
+    // Listener antes del click para no perder la navegación en CI
+    const navPromise = page.waitForURL('/jugadores')
+    await page.getByRole('button', { name: 'Rechazar' }).click()
+    await navPromise
+
     await expect(page).toHaveURL('/jugadores')
   })
 

@@ -27,11 +27,13 @@ test.describe('Aprobación y rechazo de delegados', () => {
 
     await expect(page.getByText('Delegado', { exact: true })).toBeVisible()
     // Esperar que el botón se habilite (datosCabecera se auto-llena al cargar)
-    await expect(page.getByRole('button', { name: 'Aprobar' })).not.toBeDisabled()
+    await expect(page.getByRole('button', { name: 'Aprobar' })).toBeEnabled()
 
+    // Listener antes del click para no perder la navegación en CI
+    const navPromise = page.waitForURL('/delegados')
     await page.getByRole('button', { name: 'Aprobar' }).click()
+    await navPromise
 
-    await page.waitForURL('/delegados')
     await expect(page).toHaveURL('/delegados')
   })
 
@@ -61,9 +63,10 @@ test.describe('Aprobación y rechazo de delegados', () => {
     ).toBeVisible()
 
     // Confirmar el rechazo
+    const navPromise = page.waitForURL('/delegados')
     await page.getByRole('button', { name: 'Eliminar definitivamente' }).click()
+    await navPromise
 
-    await page.waitForURL('/delegados')
     await expect(page).toHaveURL('/delegados')
   })
 })

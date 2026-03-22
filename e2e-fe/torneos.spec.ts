@@ -31,8 +31,9 @@ test.describe('Torneos', () => {
     await page.goto('/torneos/agrupadores/crear')
     await expect(page.getByText('Crear agrupador de torneos')).toBeVisible()
     await page.getByPlaceholder('Nombre del agrupador').fill('Liga E2E')
+    const navAgrupador = page.waitForURL('/torneos/agrupadores')
     await page.getByRole('button', { name: 'Guardar' }).click()
-    await page.waitForURL('/torneos/agrupadores')
+    await navAgrupador
 
     // Paso 2: crear el torneo con ese agrupador
     await page.goto('/torneos/crear')
@@ -58,10 +59,9 @@ test.describe('Torneos', () => {
     await page.getByRole('button', { name: 'Todos contra todos' }).click()
 
     // Crear el torneo
+    const navTorneo = page.waitForURL('/torneos')
     await page.getByRole('button', { name: 'Crear torneo' }).click()
-
-    // Verifica que vuelve a la lista y el torneo aparece
-    await page.waitForURL('/torneos')
+    await navTorneo
     await expect(page).toHaveURL('/torneos')
     await expect(page.getByText('Torneo E2E 2026')).toBeVisible()
   })
