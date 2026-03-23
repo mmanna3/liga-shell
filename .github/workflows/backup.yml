@@ -11,22 +11,29 @@ jobs:
     environment: edefi
     steps:
       - name: "0 - Validar archivos locales (máx 4)"
-        run: curl -fsS -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/validar-archivos-locales"
+        run: |
+          curl -fsS -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/validar-archivos-locales"
 
       - name: "1 - Generar backup BD en disco"
-        run: curl -fsS -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/guardar-backup-bd-en-disco"
+        run: |
+          curl -fsS -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/guardar-backup-bd-en-disco"
 
       - name: "2 - Generar backup imágenes en disco"
-        run: curl -fsS -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/guardar-backup-imagenes-en-disco"
+        run: |
+          curl -fsS -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/guardar-backup-imagenes-en-disco"
 
       - name: "3 - Rotar backups en Drive (borra el más viejo si hay 3 pares)"
-        run: curl -fsS -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/rotar-backups-en-drive"
+        run: |
+          curl -fsS -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/rotar-backups-en-drive"
 
       - name: "4 - Subir backup BD a Drive"
-        run: curl -fsS -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/subir-backup-bd-a-drive"
+        run: |
+          curl -fsS -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/subir-backup-bd-a-drive"
 
       - name: "5 - Subir backup imágenes a Drive"
-        run: curl -fsS -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/subir-backup-imagenes-a-drive"
+        run: |
+          curl -fsS -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/subir-backup-imagenes-a-drive"
 
       - name: "6 - Limpiar backups locales"
-        run: curl -fsS -X DELETE -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/limpiar-backups-locales"
+        run: |
+          curl -fsS -X DELETE -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/limpiar-backups-locales"
