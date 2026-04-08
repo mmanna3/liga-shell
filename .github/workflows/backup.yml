@@ -10,7 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: edefi
     steps:
-      - name: "0 - Validar archivos locales (máx 4)"
+      - name: "0a - Limpiar backups locales previos (si quedaron de un run fallido)"
+        run: |
+          curl -fsS -X DELETE -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/limpiar-backups-locales"
+
+      - name: "0b - Validar archivos locales (máx 4)"
         run: |
           curl -fsS -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/validar-archivos-locales"
 
@@ -35,5 +39,6 @@ jobs:
           curl -fsS -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/subir-backup-imagenes-a-drive"
 
       - name: "6 - Limpiar backups locales"
+        if: always()
         run: |
           curl -fsS -X DELETE -H "X-Api-Key: ${{ secrets.BACKUP_API_KEY }}" "${{ vars.API_URL }}/api/backup/limpiar-backups-locales"
