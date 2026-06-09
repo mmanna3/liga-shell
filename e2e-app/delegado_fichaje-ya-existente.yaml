@@ -1,18 +1,25 @@
 appId: com.ykn.edefidelegados
+name: Delegado — registro ya existente
 ---
 # Flujo "delegado ya registrado" (verde): login → No estoy registrado → intro →
 # código club → DNI → confirmación → completado
 #
 # DNI 87654321 (Pedro González): seeded como Activo en Club 1, el-dni-esta-fichado
-# devuelve true → flujo delegado ya registrado.
+# devuelve true → validarDniVerde pasa OK.
 - launchApp:
     clearState: true
 - waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'card-delegados'
+    timeout: 15000
 - tapOn:
     id: 'card-delegados'
-# PantallaLogin
-- assertVisible:
-    id: 'pantalla-login'
+# Esperar la navegación
+- extendedWaitUntil:
+    visible:
+      id: 'pantalla-login'
+    timeout: 15000
 - tapOn:
     id: 'boton-no-registrado'
 # PantallaIntroDelegado
@@ -32,6 +39,7 @@ appId: com.ykn.edefidelegados
     visible:
       id: 'boton-validar-club'
       enabled: true
+    timeout: 15000
 - tapOn:
     id: 'boton-validar-club'
 # PasoDniDelegado (paso 2 de 3)
@@ -49,6 +57,7 @@ appId: com.ykn.edefidelegados
     visible:
       id: 'boton-continuar-dni-verde'
       enabled: true
+    timeout: 15000
 - tapOn:
     id: 'boton-continuar-dni-verde'
 # PasoConfirmacionYaRegistrado (paso 3 de 3) → POST /api/Delegado/fichar-delegado-solo-con-dni-y-club
@@ -58,6 +67,7 @@ appId: com.ykn.edefidelegados
     visible:
       id: 'boton-enviar-ya-registrado'
       enabled: true
+    timeout: 15000
 - tapOn:
     id: 'boton-enviar-ya-registrado'
 # PantallaCompletado

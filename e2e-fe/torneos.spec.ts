@@ -13,7 +13,7 @@ test.describe('Torneos', () => {
     await page.goto('/torneos')
 
     await expect(
-      page.getByText('No hay torneos para el año seleccionado')
+      page.getByText('No hay torneos para los filtros seleccionados')
     ).toBeVisible()
   })
 

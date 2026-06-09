@@ -1,0 +1,58 @@
+appId: com.ykn.edefidelegados
+tags:
+  - skip
+name: Delegado — error al cargar jugadores
+---
+# Error de red al cargar mis jugadores: el servidor devuelve 500 → pantalla de error
+#
+# Verifica que cuando GET /api/carnet-digital/carnets falla, la pantalla muestra
+# el estado de error en lugar de crashear o quedarse en loading indefinido.
+#
+# El mock server usa lógica determinista: equipoId=3 (Equipo B2) → devuelve 500.
+# No necesita cambio de escenario — seleccionar Equipo B2 dispara el error.
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'card-delegados'
+    timeout: 15000
+- tapOn:
+    id: 'card-delegados'
+# Esperar la navegación
+- extendedWaitUntil:
+    visible:
+      id: 'pantalla-login'
+    timeout: 15000
+- tapOn:
+    id: 'input-usuario'
+- inputText: 'delegado-e2e'
+- tapOn:
+    id: 'input-password'
+- inputText: 'password123'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'boton-iniciar-sesion'
+      enabled: true
+    timeout: 15000
+- tapOn:
+    id: 'boton-iniciar-sesion'
+# PantallaSeleccionEquipo — elegir Equipo B2 (id=3) que dispara el error
+- extendedWaitUntil:
+    visible:
+      id: 'pantalla-seleccion-equipo'
+    timeout: 15000
+- tapOn:
+    id: 'item-equipo-3'
+# Tab Mis Jugadores — debe mostrar estado de error, no crash
+- extendedWaitUntil:
+    visible:
+      text: 'Error al cargar los jugadores.'
+    timeout: 15000
+- assertNotVisible:
+    id: 'carnet-jugador-1'

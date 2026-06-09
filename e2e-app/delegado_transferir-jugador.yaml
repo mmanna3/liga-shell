@@ -1,0 +1,88 @@
+appId: com.ykn.edefidelegados
+name: Delegado — transferir jugador
+---
+# Transferir jugador individual: long press → modal acciones → seleccionar equipo destino → confirmar
+#
+# Verifica el flujo de dos pasos del modal de transferencia:
+#   1. Selección de equipo destino (lista de otros equipos del delegado)
+#   2. Confirmación de la transferencia
+#
+# Nota iOS: ModalAccionesJugador es un bottom sheet (justify-end) — se usa coordenada relativa.
+# Los modales centrados (justify-center) exponen sus elementos por testID en Maestro.
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'card-delegados'
+    timeout: 15000
+- tapOn:
+    id: 'card-delegados'
+# Esperar la navegación
+- extendedWaitUntil:
+    visible:
+      id: 'pantalla-login'
+    timeout: 15000
+- tapOn:
+    id: 'input-usuario'
+- inputText: 'delegado-e2e'
+- tapOn:
+    id: 'input-password'
+- inputText: 'password123'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'boton-iniciar-sesion'
+      enabled: true
+    timeout: 15000
+- tapOn:
+    id: 'boton-iniciar-sesion'
+# PantallaSeleccionEquipo
+- assertVisible:
+    id: 'pantalla-seleccion-equipo'
+- tapOn:
+    id: 'item-equipo-1'
+# Tab Mis Jugadores — long press para abrir modal acciones
+- assertVisible:
+    id: 'pantalla-mis-jugadores'
+- extendedWaitUntil:
+    visible:
+      id: 'carnet-jugador-1'
+    timeout: 15000
+- longPressOn:
+    id: 'carnet-jugador-1'
+- waitForAnimationToEnd
+# ModalAccionesJugador — tap por testID (Android) o coordenada relativa (iOS bottom sheet)
+# "Transferir" es el segundo botón: ~83% vertical en iPhone SE
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - tapOn:
+          id: 'boton-transferir-jugador'
+- runFlow:
+    when:
+      platform: ios
+    commands:
+      - tapOn:
+          point: '50%, 83%'
+# ModalTransferirJugador — paso 1: selección de equipo destino
+# Equipo B tiene id=2 en el seed → testID equipo-destino-2
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'equipo-destino-2'
+    timeout: 15000
+- tapOn:
+    id: 'equipo-destino-2'
+# ModalTransferirJugador — paso 2: confirmación
+- waitForAnimationToEnd
+- tapOn:
+    id: 'boton-confirmar-transferencia'
+# Regresa a la pantalla principal
+- assertVisible:
+    id: 'pantalla-mis-jugadores'

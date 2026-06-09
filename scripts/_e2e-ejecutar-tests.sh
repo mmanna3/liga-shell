@@ -51,4 +51,20 @@ adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:
 
 echo ""
 echo "Ejecutando tests E2E..."
-maestro test --exclude-tags skip --debug-output "$APP_DIR/e2e-debug" --format HTML --output "$APP_DIR/e2e-report.html" "$ROOT/e2e-app/"
+E2E_FLOWS=(
+  "$ROOT/e2e-app/fichaje_nuevo-jugador.yaml"
+  "$ROOT/e2e-app/fichaje_jugador-fichado-en-otro-equipo.yaml"
+  "$ROOT/e2e-app/delegado_fichaje-no-existente.yaml"
+  "$ROOT/e2e-app/delegado_fichaje-ya-existente.yaml"
+  "$ROOT/e2e-app/delegado_fichaje-nuevo-jugador.yaml"
+  "$ROOT/e2e-app/delegado_fichaje-jugador-en-otro-equipo.yaml"
+  "$ROOT/e2e-app/delegado_navegacion-tabs-principal.yaml"
+  "$ROOT/e2e-app/delegado_cerrar-sesion.yaml"
+  "$ROOT/e2e-app/delegado_cambiar-equipo.yaml"
+  "$ROOT/e2e-app/delegado_transferir-jugador.yaml"
+  "$ROOT/e2e-app/delegado_eliminar-jugador.yaml"
+  "$ROOT/e2e-app/delegado_eliminar-jugadores-masivo.yaml"
+  "$ROOT/e2e-app/delegado_error-al-cargar-jugadores.yaml"
+  "$ROOT/e2e-app/delegado_error-al-eliminar.yaml"
+)
+maestro test --exclude-tags skip --debug-output "$APP_DIR/e2e-debug" --format HTML --output "$APP_DIR/e2e-report.html" "${E2E_FLOWS[@]}"

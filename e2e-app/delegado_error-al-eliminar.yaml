@@ -1,0 +1,92 @@
+appId: com.ykn.edefidelegados
+tags:
+  - skip
+name: Delegado — error al eliminar
+---
+# Error al eliminar jugador: el servidor devuelve 500 → aparece alerta de error
+#
+# Verifica que cuando la API falla durante una desvinculación, el error se comunica
+# al usuario (Alert nativo) y la app no crashea ni queda en estado indefinido.
+#
+# El mock server usa lógica determinista: equipoId=2 (Equipo B1) → devuelve 500 en desvincular.
+# Seleccionamos Equipo B1 (id=2) para disparar el error al eliminar.
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'card-delegados'
+    timeout: 15000
+- tapOn:
+    id: 'card-delegados'
+# Esperar la navegación
+- extendedWaitUntil:
+    visible:
+      id: 'pantalla-login'
+    timeout: 15000
+- tapOn:
+    id: 'input-usuario'
+- inputText: 'delegado-e2e'
+- tapOn:
+    id: 'input-password'
+- inputText: 'password123'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'boton-iniciar-sesion'
+      enabled: true
+    timeout: 15000
+- tapOn:
+    id: 'boton-iniciar-sesion'
+# PantallaSeleccionEquipo — elegir Equipo B1 (id=2) para disparar error en desvincular
+- assertVisible:
+    id: 'pantalla-seleccion-equipo'
+- tapOn:
+    id: 'item-equipo-2'
+# Tab Mis Jugadores — long press → eliminar → confirmar (falla en el servidor)
+- assertVisible:
+    id: 'pantalla-mis-jugadores'
+- extendedWaitUntil:
+    visible:
+      id: 'carnet-jugador-1'
+    timeout: 15000
+- longPressOn:
+    id: 'carnet-jugador-1'
+- waitForAnimationToEnd
+# ModalAccionesJugador — tap por testID (Android) o coordenada relativa (iOS bottom sheet)
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - tapOn:
+          id: 'boton-eliminar-jugador'
+- runFlow:
+    when:
+      platform: ios
+    commands:
+      - tapOn:
+          point: '50%, 75%'
+- waitForAnimationToEnd
+# ModalEliminarJugador — confirmar (modal centrado, testID accesible en iOS)
+- extendedWaitUntil:
+    visible:
+      id: 'boton-quitar-del-equipo'
+    timeout: 10000
+- tapOn:
+    id: 'boton-quitar-del-equipo'
+# El servidor devuelve 500 → aparece Alert nativo con el título del error
+- assertVisible:
+    text: 'Error al desvincular'
+# Descartar el alert — el modal sigue abierto (la eliminación falló)
+- tapOn:
+    text: 'OK'
+# Cerrar el modal manualmente y verificar que la app sigue en pie
+- tapOn:
+    id: 'boton-cancelar-eliminar'
+- waitForAnimationToEnd
+- assertVisible:
+    id: 'pantalla-mis-jugadores'

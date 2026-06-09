@@ -1,16 +1,21 @@
 appId: com.ykn.edefidelegados
+name: Delegado — cerrar sesión
 ---
-# Flujo: login → seleccionar equipo → tab Pendientes → ver jugador pendiente de aprobación
-#
-# 33333333 (Jugador Pendiente) está seeded en Equipo 1 con estado FichajePendienteDeAprobacion.
+# Flujo: login → seleccionar equipo → menú → "Cerrar sesión" → vuelve a pantalla login
 - launchApp:
     clearState: true
 - waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'card-delegados'
+    timeout: 15000
 - tapOn:
     id: 'card-delegados'
-# PantallaLogin
-- assertVisible:
-    id: 'pantalla-login'
+# Esperar la navegación
+- extendedWaitUntil:
+    visible:
+      id: 'pantalla-login'
+    timeout: 15000
 - tapOn:
     id: 'input-usuario'
 - inputText: 'delegado-e2e'
@@ -26,6 +31,7 @@ appId: com.ykn.edefidelegados
     visible:
       id: 'boton-iniciar-sesion'
       enabled: true
+    timeout: 15000
 - tapOn:
     id: 'boton-iniciar-sesion'
 # PantallaSeleccionEquipo
@@ -33,14 +39,15 @@ appId: com.ykn.edefidelegados
     id: 'pantalla-seleccion-equipo'
 - tapOn:
     id: 'item-equipo-1'
-# Tab Pendientes
+# Tab Mis Jugadores — abrir menú → Cerrar sesión
 - assertVisible:
     id: 'pantalla-mis-jugadores'
-- tapOn: 'Pendientes'
-- assertVisible:
-    id: 'pantalla-pendientes'
+- tapOn:
+    id: 'boton-menu-principal'
+- tapOn:
+    id: 'menu-item-cerrar-sesion'
+# El auth guard redirige a home (intro) tras cerrar sesión
 - extendedWaitUntil:
     visible:
-      id: 'carnet-jugador'
-- assertVisible:
-    id: 'carnet-jugador'
+      id: 'card-delegados'
+    timeout: 15000

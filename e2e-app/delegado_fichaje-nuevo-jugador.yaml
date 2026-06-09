@@ -1,19 +1,26 @@
 appId: com.ykn.edefidelegados
+name: Delegado — fichaje nuevo jugador
 ---
 # Flujo: login → seleccionar equipo → menú "Fichar jugadores" →
 # card nuevo (azul) → datos → foto → fotos DNI → autorización → confirmación
 #
 # El equipo ya está en el store (delegado autenticado), no hay paso de código equipo.
 # DNI 34567890: no está en la DB, el-dni-esta-fichado devuelve false → flujo nuevo jugador.
-# (No se usa 12345678 para evitar conflicto con test 02 que crea ese jugador.)
+# (No se usa 12345678 para evitar conflicto con fichaje_nuevo-jugador que crea ese jugador.)
 - launchApp:
     clearState: true
 - waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'card-delegados'
+    timeout: 15000
 - tapOn:
     id: 'card-delegados'
-# PantallaLogin
-- assertVisible:
-    id: 'pantalla-login'
+# Esperar la navegación
+- extendedWaitUntil:
+    visible:
+      id: 'pantalla-login'
+    timeout: 15000
 - tapOn:
     id: 'input-usuario'
 - inputText: 'delegado-e2e'
@@ -29,6 +36,7 @@ appId: com.ykn.edefidelegados
     visible:
       id: 'boton-iniciar-sesion'
       enabled: true
+    timeout: 15000
 - tapOn:
     id: 'boton-iniciar-sesion'
 # PantallaSeleccionEquipo
@@ -53,21 +61,28 @@ appId: com.ykn.edefidelegados
     id: 'paso-datos-jugador'
 - tapOn:
     id: 'input-nombre'
-- inputText: 'Ana'
+- inputText: 'Juan'
 - tapOn:
     id: 'input-apellido'
-- inputText: 'Garcia'
+- inputText: 'Perez'
 - tapOn:
     id: 'input-dni-jugador'
 - inputText: '34567890'
 - tapOn:
+    text: 'Datos del jugador'
+- tapOn:
     id: 'input-fecha-nacimiento'
+- waitForAnimationToEnd
 - runFlow:
     when:
       platform: ios
     commands:
+      - swipe:
+          start: '75%, 70%'
+          end: '75%, 50%'
+          duration: 500
       - tapOn:
-          id: 'boton-fecha-listo'
+          point: '50%, 93%'
 - runFlow:
     when:
       platform: android
@@ -82,6 +97,7 @@ appId: com.ykn.edefidelegados
     visible:
       id: 'boton-continuar'
       enabled: true
+    timeout: 15000
 - tapOn:
     id: 'boton-continuar'
 # PasoFoto (paso 2 de 4)
@@ -116,6 +132,7 @@ appId: com.ykn.edefidelegados
     visible:
       id: 'boton-subir-foto'
       enabled: true
+    timeout: 15000
 - tapOn:
     id: 'boton-subir-foto'
 # PasoFotosDni (paso 3 de 4)
@@ -146,6 +163,8 @@ appId: com.ykn.edefidelegados
       - tapOn:
           id: 'com.google.android.documentsui:id/thumbnail'
           optional: true
+- waitForAnimationToEnd
+- scroll
 - tapOn:
     id: 'boton-seleccionar-dorso'
 - tapOn: 'Elegir de galería'
@@ -175,6 +194,7 @@ appId: com.ykn.edefidelegados
     visible:
       id: 'boton-subir-dni'
       enabled: true
+    timeout: 15000
 - tapOn:
     id: 'boton-subir-dni'
 # PasoAutorizacion (paso 4 de 4) → POST /api/Jugador al backend real

@@ -1,0 +1,77 @@
+appId: com.ykn.edefidelegados
+tags:
+  - skip
+name: Delegado — eliminación masiva
+---
+# Acciones bulk: activar modo selección → seleccionar jugador → eliminar masivo
+#
+# El modo selección se activa desde el menú principal con "Seleccionar jugadores".
+# Al activarse, los carnets muestran checkboxes y aparece la barra de acciones.
+# Verifica que la selección, la confirmación de eliminación y la desactivación
+# del modo selección funcionan correctamente.
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'card-delegados'
+    timeout: 15000
+- tapOn:
+    id: 'card-delegados'
+# Esperar la navegación
+- extendedWaitUntil:
+    visible:
+      id: 'pantalla-login'
+    timeout: 15000
+- tapOn:
+    id: 'input-usuario'
+- inputText: 'delegado-e2e'
+- tapOn:
+    id: 'input-password'
+- inputText: 'password123'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'boton-iniciar-sesion'
+      enabled: true
+    timeout: 15000
+- tapOn:
+    id: 'boton-iniciar-sesion'
+# PantallaSeleccionEquipo
+- assertVisible:
+    id: 'pantalla-seleccion-equipo'
+- tapOn:
+    id: 'item-equipo-1'
+# Tab Mis Jugadores — activar modo selección desde el menú
+- assertVisible:
+    id: 'pantalla-mis-jugadores'
+- extendedWaitUntil:
+    visible:
+      id: 'carnet-jugador-1'
+    timeout: 15000
+- tapOn:
+    id: 'boton-menu-principal'
+- tapOn:
+    id: 'menu-item-seleccionar-jugadores'
+# Modo selección activo: aparece la barra con botones bulk
+- assertVisible:
+    id: 'boton-bulk-eliminar'
+# Seleccionar el jugador (tap en modo selección activa el toggle)
+- tapOn:
+    id: 'carnet-jugador-1'
+# Tap en botón "Eliminar" de la barra de acciones bulk
+- tapOn:
+    id: 'boton-bulk-eliminar'
+# ModalEliminarMasivo — confirmar
+- waitForAnimationToEnd
+- tapOn:
+    id: 'boton-quitar-masivo'
+# Regresa a la pantalla principal con modo selección desactivado
+- assertVisible:
+    id: 'pantalla-mis-jugadores'
+- assertNotVisible:
+    id: 'boton-bulk-eliminar'

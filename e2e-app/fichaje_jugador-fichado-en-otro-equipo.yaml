@@ -1,4 +1,5 @@
 appId: com.ykn.edefidelegados
+name: Fichaje — jugador fichado en otro equipo
 ---
 # Flujo "jugador ya fichado": home → intro → código equipo → DNI → confirmación
 #
@@ -9,11 +10,17 @@ appId: com.ykn.edefidelegados
 - launchApp:
     clearState: true
 - waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'card-fichaje'
+    timeout: 15000
 - tapOn:
     id: 'card-fichaje'
-# PantallaIntro
-- assertVisible:
-    id: 'card-ya-fichado'
+# Esperar la navegación
+- extendedWaitUntil:
+    visible:
+      id: 'card-ya-fichado'
+    timeout: 15000
 - tapOn:
     id: 'card-ya-fichado'
 # PasoCodigoEquipo (paso 1 de 3)
@@ -28,6 +35,7 @@ appId: com.ykn.edefidelegados
     visible:
       id: 'boton-validar'
       enabled: true
+    timeout: 15000
 - tapOn:
     id: 'boton-validar'
 # PasoDni (paso 2 de 3)
@@ -45,6 +53,7 @@ appId: com.ykn.edefidelegados
     visible:
       id: 'boton-continuar'
       enabled: true
+    timeout: 15000
 - tapOn:
     id: 'boton-continuar'
 # PantallaConfirmacion

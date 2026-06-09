@@ -1,21 +1,21 @@
 appId: com.ykn.edefidelegados
-tags:
-  - skip
+name: Delegado — navegación y contenido en todas las tabs
 ---
-# Flujo: login → seleccionar equipo → tab Buscar → buscar código inexistente → ver mensaje vacío
-#
-# LVG0003 es el código válido para el equipo ID=3, que no existe en la DB.
-# El backend decodifica el código correctamente, no encuentra jugadores y devuelve lista vacía.
-# La app muestra "No se encontraron jugadores para este equipo".
-# (MTD9999 falla validación de checksum → 400 → error, no sirve para este test.)
+# Flujo: login → seleccionar equipo → Mis jugadores → Buscar → Pendientes
 - launchApp:
     clearState: true
 - waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'card-delegados'
+    timeout: 15000
 - tapOn:
     id: 'card-delegados'
-# PantallaLogin
-- assertVisible:
-    id: 'pantalla-login'
+# Esperar la navegación
+- extendedWaitUntil:
+    visible:
+      id: 'pantalla-login'
+    timeout: 15000
 - tapOn:
     id: 'input-usuario'
 - inputText: 'delegado-e2e'
@@ -31,22 +31,27 @@ tags:
     visible:
       id: 'boton-iniciar-sesion'
       enabled: true
+    timeout: 15000
 - tapOn:
     id: 'boton-iniciar-sesion'
-# PantallaSeleccionEquipo
+# PantallaSeleccionEquipo — tap en el primer equipo del seed
 - assertVisible:
     id: 'pantalla-seleccion-equipo'
 - tapOn:
     id: 'item-equipo-1'
-# Tab Buscar
+# Tab Mis Jugadores
 - assertVisible:
     id: 'pantalla-mis-jugadores'
-- tapOn: 'Buscar'
+- assertVisible:
+    id: 'carnet-jugador-1'
+# Tab Buscar
+- tapOn:
+    id: 'tab-buscar'
 - assertVisible:
     id: 'pantalla-buscar'
 - tapOn:
     id: 'input-codigo-buscar'
-- inputText: 'LVG0003'
+- inputText: 'MTD0001'
 - runFlow:
     when:
       platform: android
@@ -54,7 +59,12 @@ tags:
       - hideKeyboard
 - tapOn:
     id: 'boton-buscar'
-- extendedWaitUntil:
-    visible: 'No se encontraron jugadores para este equipo'
-    timeout: 60000
-- assertVisible: 'No se encontraron jugadores para este equipo'
+- assertVisible:
+    id: 'carnet-jugador-1'
+# Tab Pendientes
+- tapOn:
+    id: 'tab-pendientes'
+- assertVisible:
+    id: 'pantalla-pendientes'
+- assertVisible:
+    id: 'carnet-jugador-2'

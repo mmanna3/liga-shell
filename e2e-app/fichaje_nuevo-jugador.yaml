@@ -1,65 +1,71 @@
 appId: com.ykn.edefidelegados
+name: Fichaje — nuevo jugador
 ---
-# Flujo completo "nuevo delegado" (azul): login → No estoy registrado → intro →
-# código club → datos → foto → fotos DNI → confirmación → completado
+# Flujo completo "nuevo jugador": home → intro → código → datos → foto → fotos DNI → autorización → confirmación
 #
-# DNI 23456789: no está en la DB, el-dni-esta-fichado devuelve false → flujo nuevo delegado.
-# (No se usa 12345678 para evitar conflicto con test 02 que crea ese jugador.)
+# DNI 12345678: backend devuelve false en el-dni-esta-fichado → flujo nuevo jugador.
+# Nota E2E: fotos de prueba inyectadas en galería vía adb antes de la suite.
 - launchApp:
     clearState: true
 - waitForAnimationToEnd
-- tapOn:
-    id: 'card-delegados'
-# PantallaLogin
-- assertVisible:
-    id: 'pantalla-login'
-- tapOn:
-    id: 'boton-no-registrado'
-# PantallaIntroDelegado
-- assertVisible:
-    id: 'pantalla-intro-delegado'
-- tapOn:
-    id: 'card-nuevo-delegado'
-# PasoCodigoClub (paso 1 de 5)
-- assertVisible:
-    id: 'paso-codigo-club'
-- tapOn:
-    id: 'input-codigo-club'
-- inputText: 'MTD0001'
-- tapOn:
-    id: 'titulo-codigo-club'
 - extendedWaitUntil:
     visible:
-      id: 'boton-validar-club'
-      enabled: true
+      id: 'card-fichaje'
+    timeout: 15000
 - tapOn:
-    id: 'boton-validar-club'
-# PasoDatosDelegado (paso 2 de 5)
+    id: 'card-fichaje'
+# Esperar la navegación
+- extendedWaitUntil:
+    visible:
+      id: 'card-nuevo'
+    timeout: 15000
+- tapOn:
+    id: 'card-nuevo'
+# PasoCodigoEquipo (paso 1 de 5)
 - assertVisible:
-    id: 'paso-datos-delegado'
+    id: 'paso-codigo-equipo'
 - tapOn:
-    id: 'input-nombre-delegado'
+    id: 'input-codigo-equipo'
+- inputText: 'MTD0001'
+- tapOn:
+    id: 'titulo-codigo-equipo'
+- extendedWaitUntil:
+    visible:
+      id: 'boton-validar'
+      enabled: true
+    timeout: 15000
+- tapOn:
+    id: 'boton-validar'
+# PasoDatosJugador (paso 2 de 5) — fecha de nacimiento vía date picker
+- assertVisible:
+    id: 'paso-datos-jugador'
+- tapOn:
+    id: 'input-nombre'
 - inputText: 'Juan'
 - tapOn:
-    id: 'input-apellido-delegado'
+    id: 'input-apellido'
 - inputText: 'Perez'
 - tapOn:
-    id: 'input-dni-delegado'
-- inputText: '23456789'
-- runFlow:
-    when:
-      platform: android
-    commands:
-      - hideKeyboard
+    id: 'input-dni-jugador'
+- inputText: '12345678'
+# Cerrar teclado antes de abrir el picker (necesario en iOS)
 - tapOn:
-    id: 'input-fecha-nacimiento-delegado'
-# Confirmar fecha: iOS usa botón "Listo", Android usa "OK" del picker nativo
+    text: 'Datos del jugador'
+- tapOn:
+    id: 'input-fecha-nacimiento'
+- waitForAnimationToEnd
+# iOS: el Modal del date picker no expone sus elementos al árbol de accesibilidad de Maestro;
+# se gira la rueda del año con swipe (dispara onChange) y se cierra con tap en "Listo" (~93% vertical)
 - runFlow:
     when:
       platform: ios
     commands:
+      - swipe:
+          start: '75%, 70%'
+          end: '75%, 50%'
+          duration: 500
       - tapOn:
-          id: 'boton-fecha-listo'
+          point: '50%, 93%'
 - runFlow:
     when:
       platform: android
@@ -70,33 +76,18 @@ appId: com.ykn.edefidelegados
       - tapOn:
           text: 'Aceptar'
           optional: true
-- tapOn:
-    id: 'input-email-delegado'
-- inputText: 'juan.perez@ejemplo.com'
-- runFlow:
-    when:
-      platform: android
-    commands:
-      - hideKeyboard
-- tapOn:
-    id: 'input-celular-delegado'
-- inputText: '1123456789'
-- runFlow:
-    when:
-      platform: android
-    commands:
-      - hideKeyboard
 - extendedWaitUntil:
     visible:
-      id: 'boton-continuar-datos'
+      id: 'boton-continuar'
       enabled: true
+    timeout: 15000
 - tapOn:
-    id: 'boton-continuar-datos'
-# PasoFotoDelegado (paso 3 de 5) — seleccionar foto desde galería
+    id: 'boton-continuar'
+# PasoFoto (paso 3 de 5) — seleccionar foto desde galería
 - assertVisible:
-    id: 'paso-foto-delegado'
+    id: 'paso-foto'
 - tapOn:
-    id: 'boton-seleccionar-foto-delegado'
+    id: 'boton-seleccionar-foto'
 - tapOn: 'Elegir de galería'
 - runFlow:
     when:
@@ -122,15 +113,16 @@ appId: com.ykn.edefidelegados
           optional: true
 - extendedWaitUntil:
     visible:
-      id: 'boton-subir-foto-delegado'
+      id: 'boton-subir-foto'
       enabled: true
+    timeout: 15000
 - tapOn:
-    id: 'boton-subir-foto-delegado'
-# PasoFotosDniDelegado (paso 4 de 5) — frente y dorso desde galería
+    id: 'boton-subir-foto'
+# PasoFotosDni (paso 4 de 5) — frente y dorso desde galería
 - assertVisible:
-    id: 'paso-fotos-dni-delegado'
+    id: 'paso-fotos-dni'
 - tapOn:
-    id: 'boton-seleccionar-frente-delegado'
+    id: 'boton-seleccionar-frente'
 - tapOn: 'Elegir de galería'
 - runFlow:
     when:
@@ -154,8 +146,10 @@ appId: com.ykn.edefidelegados
       - tapOn:
           id: 'com.google.android.documentsui:id/thumbnail'
           optional: true
+- waitForAnimationToEnd
+- scroll
 - tapOn:
-    id: 'boton-seleccionar-dorso-delegado'
+    id: 'boton-seleccionar-dorso'
 - tapOn: 'Elegir de galería'
 - runFlow:
     when:
@@ -179,21 +173,19 @@ appId: com.ykn.edefidelegados
       - tapOn:
           id: 'com.google.android.documentsui:id/thumbnail'
           optional: true
+- waitForAnimationToEnd
 - extendedWaitUntil:
     visible:
-      id: 'boton-subir-dni-delegado'
+      id: 'boton-subir-dni'
       enabled: true
+    timeout: 15000
 - tapOn:
-    id: 'boton-subir-dni-delegado'
-# PasoConfirmacionDelegado (paso 5 de 5) → POST /api/Delegado al backend real
+    id: 'boton-subir-dni'
+# PasoAutorizacion (paso 5 de 5) → POST /api/Jugador al backend real
 - assertVisible:
-    id: 'paso-confirmacion-delegado'
-- extendedWaitUntil:
-    visible:
-      id: 'boton-enviar-delegado'
-      enabled: true
+    id: 'paso-autorizacion'
 - tapOn:
-    id: 'boton-enviar-delegado'
-# PantallaCompletado
+    id: 'boton-enviar'
+# PantallaConfirmacion
 - assertVisible:
-    id: 'pantalla-completado-delegado'
+    id: 'pantalla-confirmacion'

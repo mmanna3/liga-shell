@@ -1,0 +1,82 @@
+appId: com.ykn.edefidelegados
+name: Delegado — eliminar jugador
+---
+# Eliminar jugador individual: long press → modal acciones → confirmar eliminación
+#
+# Verifica el flujo completo de desvinculación de un jugador de un equipo.
+# Al confirmar, el modal se cierra y se vuelve a la pantalla principal.
+#
+# Usa carnet-jugador-2 para no interferir con delegado_transferir-jugador (carnet-jugador-2).
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'card-delegados'
+    timeout: 15000
+- tapOn:
+    id: 'card-delegados'
+# Esperar la navegación
+- extendedWaitUntil:
+    visible:
+      id: 'pantalla-login'
+    timeout: 15000
+- tapOn:
+    id: 'input-usuario'
+- inputText: 'delegado-e2e'
+- tapOn:
+    id: 'input-password'
+- inputText: 'password123'
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'boton-iniciar-sesion'
+      enabled: true
+    timeout: 15000
+- tapOn:
+    id: 'boton-iniciar-sesion'
+# PantallaSeleccionEquipo
+- assertVisible:
+    id: 'pantalla-seleccion-equipo'
+- tapOn:
+    id: 'item-equipo-1'
+# Tab Mis Jugadores — long press para abrir modal acciones
+- assertVisible:
+    id: 'pantalla-mis-jugadores'
+- extendedWaitUntil:
+    visible:
+      id: 'carnet-jugador-2'
+    timeout: 15000
+- longPressOn:
+    id: 'carnet-jugador-2'
+- waitForAnimationToEnd
+# ModalAccionesJugador — tap por testID (Android) o coordenada relativa (iOS)
+# iOS: React Native Modal bottom sheet — usar coordenada relativa
+- runFlow:
+    when:
+      platform: android
+    commands:
+      - tapOn:
+          id: 'boton-eliminar-jugador'
+- runFlow:
+    when:
+      platform: ios
+    commands:
+      - tapOn:
+          point: '50%, 75%'
+# ModalEliminarJugador — confirmar desvinculación
+- extendedWaitUntil:
+    visible:
+      id: 'boton-quitar-del-equipo'
+    timeout: 10000
+- tapOn:
+    id: 'boton-quitar-del-equipo'
+# Regresa a la pantalla principal con el modal cerrado
+- extendedWaitUntil:
+    visible:
+      id: 'pantalla-mis-jugadores'
+    timeout: 15000

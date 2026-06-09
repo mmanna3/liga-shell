@@ -1,4 +1,5 @@
 appId: com.ykn.edefidelegados
+name: Delegado — cambiar equipo
 ---
 # Flujo: login → seleccionar equipo 1 → menú → "Cambiar equipo" → seleccionar equipo 2 → mis jugadores
 #
@@ -6,11 +7,17 @@ appId: com.ykn.edefidelegados
 - launchApp:
     clearState: true
 - waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'card-delegados'
+    timeout: 15000
 - tapOn:
     id: 'card-delegados'
-# PantallaLogin
-- assertVisible:
-    id: 'pantalla-login'
+# Esperar la navegación
+- extendedWaitUntil:
+    visible:
+      id: 'pantalla-login'
+    timeout: 15000
 - tapOn:
     id: 'input-usuario'
 - inputText: 'delegado-e2e'
@@ -26,6 +33,7 @@ appId: com.ykn.edefidelegados
     visible:
       id: 'boton-iniciar-sesion'
       enabled: true
+    timeout: 15000
 - tapOn:
     id: 'boton-iniciar-sesion'
 # PantallaSeleccionEquipo — seleccionar primer equipo
