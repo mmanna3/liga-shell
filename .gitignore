@@ -1,6 +1,7 @@
 liga-be/
 liga-fe/
 app-carnet-digital/
+liga-web-publica/
 .DS_Store
 
 scripts/crear-bd-liga/bin/
