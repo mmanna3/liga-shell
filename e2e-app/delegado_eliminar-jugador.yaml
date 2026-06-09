@@ -6,7 +6,8 @@ name: Delegado — eliminar jugador
 # Verifica el flujo completo de desvinculación de un jugador de un equipo.
 # Al confirmar, el modal se cierra y se vuelve a la pantalla principal.
 #
-# Usa carnet-jugador-2 para no interferir con delegado_transferir-jugador (carnet-jugador-2).
+# Usa carnet-jugador-6 (66666666, Inhabilitado): visible en mis jugadores y desvinculable por delegado.
+# delegado_transferir-jugador usa carnet-jugador-3 (Activo).
 - launchApp:
     clearState: true
 - waitForAnimationToEnd
@@ -49,10 +50,10 @@ name: Delegado — eliminar jugador
     id: 'pantalla-mis-jugadores'
 - extendedWaitUntil:
     visible:
-      id: 'carnet-jugador-2'
+      id: 'carnet-jugador-6'
     timeout: 15000
 - longPressOn:
-    id: 'carnet-jugador-2'
+    id: 'carnet-jugador-6'
 - waitForAnimationToEnd
 # ModalAccionesJugador — tap por testID (Android) o coordenada relativa (iOS)
 # iOS: React Native Modal bottom sheet — usar coordenada relativa

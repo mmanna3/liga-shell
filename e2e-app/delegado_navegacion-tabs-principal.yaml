@@ -39,11 +39,13 @@ name: Delegado — navegación y contenido en todas las tabs
     id: 'pantalla-seleccion-equipo'
 - tapOn:
     id: 'item-equipo-1'
-# Tab Mis Jugadores
+# Tab Mis Jugadores — jugador activo seeded (99999999) tiene jugador id=3 en la BD
 - assertVisible:
     id: 'pantalla-mis-jugadores'
-- assertVisible:
-    id: 'carnet-jugador-1'
+- extendedWaitUntil:
+    visible:
+      id: 'carnet-jugador-3'
+    timeout: 15000
 # Tab Buscar
 - tapOn:
     id: 'tab-buscar'
@@ -59,12 +61,16 @@ name: Delegado — navegación y contenido en todas las tabs
       - hideKeyboard
 - tapOn:
     id: 'boton-buscar'
-- assertVisible:
-    id: 'carnet-jugador-1'
-# Tab Pendientes
+- extendedWaitUntil:
+    visible:
+      id: 'carnet-jugador-3'
+    timeout: 60000
+# Tab Pendientes — jugador pendiente seeded (33333333) tiene jugador id=2 en la BD
 - tapOn:
     id: 'tab-pendientes'
 - assertVisible:
     id: 'pantalla-pendientes'
-- assertVisible:
-    id: 'carnet-jugador-2'
+- extendedWaitUntil:
+    visible:
+      id: 'carnet-jugador-2'
+    timeout: 15000

@@ -75,6 +75,8 @@ name: Delegado — fichaje jugador en otro equipo
     timeout: 15000
 - tapOn:
     id: 'boton-continuar'
-# PantallaConfirmacion
-- assertVisible:
-    id: 'pantalla-confirmacion'
+# PantallaConfirmacion — esperar POST /api/publico/fichar-en-otro-equipo
+- extendedWaitUntil:
+    visible:
+      id: 'pantalla-confirmacion'
+    timeout: 60000

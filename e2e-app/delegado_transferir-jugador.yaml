@@ -46,15 +46,15 @@ name: Delegado — transferir jugador
     id: 'pantalla-seleccion-equipo'
 - tapOn:
     id: 'item-equipo-1'
-# Tab Mis Jugadores — long press para abrir modal acciones
+# Tab Mis Jugadores — long press en jugador activo (id=3, DNI 99999999; delegados no tienen long press)
 - assertVisible:
     id: 'pantalla-mis-jugadores'
 - extendedWaitUntil:
     visible:
-      id: 'carnet-jugador-1'
+      id: 'carnet-jugador-3'
     timeout: 15000
 - longPressOn:
-    id: 'carnet-jugador-1'
+    id: 'carnet-jugador-3'
 - waitForAnimationToEnd
 # ModalAccionesJugador — tap por testID (Android) o coordenada relativa (iOS bottom sheet)
 # "Transferir" es el segundo botón: ~83% vertical en iPhone SE
