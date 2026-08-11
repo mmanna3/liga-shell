@@ -5,6 +5,7 @@ cd $SCRIPT_DIR/../liga-be/Api
 dotnet build
 cd $SCRIPT_DIR
 swagger tofile --output swagger.json ../liga-be/Api/bin/Debug/net8.0/Api.dll v1
-nswag openapi2tsclient /input:swagger.json /output:./../app-carnet-digital/lib/api/clients.ts
+nswag openapi2tsclient /input:swagger.json /output:./../app-carnet-digital/app/logica-compartida/api/clients.ts
+cp ./../app-carnet-digital/app/logica-compartida/api/clients.ts ./../app-carnet-digital/lib/api/clients.ts
 rm swagger.json
 cd $ME_LLAMARON_DESDE
