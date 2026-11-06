@@ -3,7 +3,7 @@ name: Fichaje — jugador fichado en otro equipo
 ---
 # Flujo "jugador ya fichado": home → intro → código equipo → DNI → confirmación
 #
-# DNI 44444444 (Carlos Ruiz): seeded como Activo en Equipo 2, el-dni-esta-fichado
+# DNI 44444444 (Carlos Ruiz): seeded como Activo en el Equipo 3 (otro torneo), el-dni-esta-fichado
 # devuelve true y habilita el flujo ya-fichado (fichar-en-otro-equipo al Equipo 1).
 # (No se usa 87654321 porque ese DNI es también delegado; FicharEnOtroEquipo verifica
 # el estado del delegado, y si en una corrida anterior quedó como Pendiente, falla.)

@@ -46,13 +46,16 @@ name: Delegado — transferir jugador
     id: 'pantalla-seleccion-equipo'
 - tapOn:
     id: 'item-equipo-1'
-# Tab Mis Jugadores — long press en jugador activo (id=3, DNI 99999999; delegados no tienen long press)
+# Tab Mis Jugadores — long press en jugador activo (id=3, DNI 99999999; delegados no tienen long press).
+# Los delegados del club se listan primero y el carnet queda abajo de la pantalla.
 - assertVisible:
     id: 'pantalla-mis-jugadores'
-- extendedWaitUntil:
-    visible:
+- scrollUntilVisible:
+    element:
       id: 'carnet-jugador-3'
+    direction: DOWN
     timeout: 15000
+    centerElement: true
 - longPressOn:
     id: 'carnet-jugador-3'
 - waitForAnimationToEnd
