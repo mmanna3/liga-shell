@@ -48,10 +48,12 @@ name: Delegado — eliminar jugador
 # Tab Mis Jugadores — long press para abrir modal acciones
 - assertVisible:
     id: 'pantalla-mis-jugadores'
-- extendedWaitUntil:
-    visible:
+- scrollUntilVisible:
+    element:
       id: 'carnet-jugador-6'
+    direction: DOWN
     timeout: 15000
+    centerElement: true
 - longPressOn:
     id: 'carnet-jugador-6'
 - waitForAnimationToEnd

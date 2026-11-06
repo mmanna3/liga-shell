@@ -5,7 +5,7 @@ name: Delegado — fichaje jugador en otro equipo
 # card ya fichado (verde) → DNI → confirmación
 #
 # El equipo ya está en el store (delegado autenticado), no hay paso de código equipo.
-# DNI 55555555 (María López): seeded como Activo en Equipo 2, el-dni-esta-fichado
+# DNI 55555555 (María López): seeded como Activo en el Equipo 3 (otro torneo), el-dni-esta-fichado
 # devuelve true → flujo ya-fichado (fichar-en-otro-equipo al Equipo 1).
 # (No se usa 87654321 para evitar conflicto con fichaje_jugador-fichado-en-otro-equipo.)
 - launchApp:
