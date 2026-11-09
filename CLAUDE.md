@@ -4,12 +4,49 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Estructura del repo
 
-Monorepo con tres subproyectos independientes:
+Esta carpeta es el repo `mmanna3/liga-shell` (público). Cada subproyecto es **su propio repo de GitHub**, clonado adentro e ignorado en `.gitignore`. Los commits y PRs se hacen en el repo de cada subcarpeta:
 
-- `liga-be/` — Backend ASP.NET Core C# + SQL Server. Solución `Liga.sln`.
-- `liga-fe/` — Frontend web Vite + React 19 + TypeScript.
-- `app-carnet-digital/` — App React Native + Expo (tiene su propio `CLAUDE.md`).
+- `liga-be/` → `mmanna3/liga-be` — Backend ASP.NET Core C# + SQL Server. Solución `Liga.sln`.
+- `liga-fe/` → `mmanna3/liga-fe` — Frontend web Vite + React 19 + TypeScript.
+- `app-carnet-digital/` → `mmanna3/app-carnet-digital` — App React Native + Expo (tiene su propio `CLAUDE.md`).
+- `liga-web-publica/` → `mmanna3/liga-web-publica`.
+
+Lo que vive en `liga-shell`:
+
 - `scripts/` — Scripts utilitarios compartidos.
+- `e2e-fe/` — Specs Playwright del front contra el back real (`scripts/run-e2e-fe.sh`).
+- `e2e-app/` — Flujos Maestro de la app contra el back real.
+- `.github/workflows/` — `e2e.yml` y `backup.yml` (ver abajo).
+
+---
+
+## CI, deploy y PRs entre repos
+
+**Mergear a `main` en liga-be o liga-fe deploya a producción.** La app se deploya a mano.
+
+| Repo | En cada PR | Al pushear a `main` |
+| --- | --- | --- |
+| liga-be | `tests-pr.yml`: build y tests (check obligatorio "Build y tests") | `deploy.yml`: build, tests, migraciones y deploy a IIS |
+| liga-fe | `chequeos-pr.yml`: lint, Prettier, `tsc` + build, Vitest y E2E con mock (no obligatorio) | `gh-pages.yml`: build y E2E; si pasan, deploy por FTP |
+| app-carnet-digital | `ci.yml`: validaciones estáticas (obligatorio); los E2E con Maestro solo si el PR tiene el label `e2e` | `ci.yml` con E2E |
+| liga-shell | `e2e.yml` en cada push a cualquier rama | `e2e.yml` (también todos los días) y `backup.yml` (backup diario de producción a Google Drive) |
+
+- **Revisión:** en liga-be, liga-fe y app-carnet-digital, `CODEOWNERS` pide la aprobación de `mmanna3` para mergear a `main`. Un PR abierto por `mmanna3` no se puede autoaprobar: se mergea con `gh pr merge <n> --admin` (la regla no aplica a admins). liga-shell no tiene protección.
+- **AppVeyor está obsoleto:** todo corre en GitHub Actions.
+- **Runners:** los jobs que instalan Playwright están fijados en `ubuntu-24.04`, porque Playwright 1.58.2 no soporta Ubuntu 26.04 (el `ubuntu-latest` actual). Si se agrega un job con Playwright, usar lo mismo o actualizar Playwright.
+- **Workflows deshabilitados por inactividad:** GitHub deshabilita los workflows programados de liga-shell tras 60 días sin actividad en el repo. Ya pasó una vez y el backup diario estuvo frenado tres meses. Revisar con `gh workflow list --repo mmanna3/liga-shell --all` y reactivar con `gh workflow enable`.
+
+### E2E contra el back real (liga-shell)
+
+- `e2e.yml` baja el `main` de liga-be y de liga-fe. Por eso un PR de liga-shell que depende de un cambio en el back o el front se mergea **después** del PR de ese repo. Una vez mergeado el otro PR, volver a correr el job del PR de liga-shell para que tome el `main` nuevo.
+- Los datos salen de dos seeds en liga-be, que solo responden si `E2E_SEED_ENABLED=true`:
+  - `E2ESeedController` (`/api/e2e`): para `e2e-app`.
+  - `E2ESeedFeController` (`/api/e2e-fe`): para `e2e-fe`. Su usuario `admin` tiene control total en todos los módulos.
+- Los flujos de Maestro usan ids fijos (`carnet-jugador-3`, `item-equipo-1`, etc.) que dependen del orden de creación en el seed. Agregar datos nuevos **al final** para no correr los ids.
+
+### Requerimientos
+
+Los requerimientos para implementar se escriben en `docs/requerimientos/` del repo que corresponde (por ejemplo `app-carnet-digital/docs/requerimientos/`, `liga-be/docs/requerimientos/`).
 
 ---
 
